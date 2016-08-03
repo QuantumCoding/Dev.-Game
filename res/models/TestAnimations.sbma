@@ -1,0 +1,80 @@
+
+# Identifiers	
+	t = Translation
+	r = rotation
+	s = scale
+	
+	b = Bone
+	
+# Bone Split ':'
+
+# Data Split ' '
+# Data Access ':'
+# Data Translations
+	1.0 1.0 1.0
+	0.0 0.0 0.0
+	0.1 0.1 0.1
+	0.2 0.2 0.2
+	0.3 0.3 0.3
+	0.4 0.4 0.4
+	0.5 0.5 0.5
+	0.6 0.6 0.6
+	0.7 0.7 0.7
+	0.8 0.8 0.8
+	0.9 0.9 0.9
+	1.0 1.0 1.0
+	
+# Data Rotation
+	0 0 0
+	0 0 90
+	0 0 180
+	0 0 270
+	0 0 360
+	
+# Data Scale
+	-0.9 -0.9 -0.9
+	-0.8 -0.8 -0.8
+	-0.7 -0.7 -0.7
+	-0.6 -0.6 -0.6
+	-0.5 -0.5 -0.5
+	-0.4 -0.4 -0.4
+	-0.3 -0.3 -0.3
+	-0.2 -0.2 -0.2
+	-0.1 -0.1 -0.1
+	-0.0 -0.0 -0.0
+	
+# Animation Split Part ' '
+# Animation Split Data '->'
+# Animation Split Frame ';'
+
+# Animation Shift
+	b:1 t->Translations:1 ;
+	b:1 t->Translations:2 ;
+	b:1 t->Translations:3 ;
+	b:1 t->Translations:4 ;
+	b:1 t->Translations:5 ;
+	b:1 t->Translations:6 ;
+	b:1 t->Translations:7 ;
+	b:1 t->Translations:8 ;
+	b:1 t->Translations:9 ;
+	b:1 t->Translations:10 ;
+
+# Animation Shrink/Grow
+	b:0 s->Scale:9 ;	
+	b:0 s->Scale:8 ;
+	b:0 s->Scale:7 ;
+	b:0 s->Scale:6 ;
+	b:0 s->Scale:5 ;
+	b:0 s->Scale:4 ;
+	b:0 s->Scale:3 ;
+	b:0 s->Scale:2 ;
+	b:0 s->Scale:1 ;
+	b:0 s->Scale:0 ;
+	
+# Animation Swipe
+	b:1 r->Rotation:0 t->Translations:0 ;	
+	b:1 r->Rotation:1 t->Translations:0 ;
+	b:1 r->Rotation:2 t->Translations:0 ;
+	b:1 r->Rotation:3 t->Translations:0 ;
+	b:1 r->Rotation:4 t->Translations:0 ;
+	
