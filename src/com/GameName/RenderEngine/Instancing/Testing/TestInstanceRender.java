@@ -1,81 +1,35 @@
 package com.GameName.RenderEngine.Instancing.Testing;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
 import com.GameName.RenderEngine.Instancing.IRenderableInstance;
-import com.GameName.RenderEngine.Instancing.InstanceUtil;
 import com.GameName.RenderEngine.Instancing.InstanceVBO;
 import com.GameName.RenderEngine.Models.ModelData.ModelData;
 import com.GameName.RenderEngine.Shaders.Renderer;
 import com.GameName.RenderEngine.Shaders.Shader;
-import com.GameName.RenderEngine.Textures.Texture2D;
 import com.GameName.RenderEngine.Util.Camera;
-import com.GameName.Util.Vectors.Vector3f;
 
 public class TestInstanceRender implements IRenderableInstance<TestInstanceRenderProperties> {
 	
-	public static Texture2D TEXTURE;
-	
-	private static final float[] VERTICES = {
-		-.1f,  .1f,	-.1f, -.1f,
-		 .1f, -.1f,	 .1f,  .1f,
-	};
-	
-//	private static final float[] VERTICES = {
-//		-0.1f,  0.1f,	-0.1f, -0.1f,
-//		 0.1f, -0.1f,	 0.1f,  0.1f,
-//	};
-	
-	private static final int[] INDICES = {
-		0, 1, 2,	0, 2, 3 
-	};
-		
-	private static final ModelData modelData;
-	
-	static {
-		try {
-			TEXTURE = new Texture2D(ImageIO.read(new File("res/textures/cubes/MapingSheet.png")));
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		
-		modelData = new ModelData(10, 1000, new Vector3f());
-		modelData.storeDataInAttributeList(Shader.ATTRIBUTE_LOC_POSITIONS, 2, VERTICES, false);
-		modelData.loadIndicies(INDICES);
-	}
-	
-	public static final int MAX_RENDER_COUNT = 1;
-	public static final int INSTANCE_DATA_LENGTH = 32;//16;
+	public static final int MAX_RENDER_COUNT = 1000;
+	public static final int INSTANCE_DATA_LENGTH = 3;//16;
 	
 	private Shader shader;
+	private ModelData modelData;
 	private Renderer<TestInstanceRender, TestInstanceRenderProperties> renderer;
 
 	@SuppressWarnings("unchecked")
-	public TestInstanceRender(Shader shader) {
+	public TestInstanceRender(Shader shader, ModelData modelData) {
 		this.shader = shader;
+		this.modelData = modelData;
 		this.renderer = (Renderer<TestInstanceRender, TestInstanceRenderProperties>) shader.getRenderer();
 	}
 	
 	public void addInstanceAttributes(InstanceVBO vbo) {
-		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_0, 4, INSTANCE_DATA_LENGTH, 0, 1);
-		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_1, 4, INSTANCE_DATA_LENGTH, 4, 1);
-		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_2, 4, INSTANCE_DATA_LENGTH, 8, 1);
-		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_3, 4, INSTANCE_DATA_LENGTH, 12, 1);
+//		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_0, 4, INSTANCE_DATA_LENGTH, 0, 1);
+//		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_1, 4, INSTANCE_DATA_LENGTH, 4, 1);
+//		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_2, 4, INSTANCE_DATA_LENGTH, 8, 1);
+//		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_3, 4, INSTANCE_DATA_LENGTH, 12, 1);
 		
-		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_4, 4, INSTANCE_DATA_LENGTH, 16, 1);
-		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_5, 4, INSTANCE_DATA_LENGTH, 20, 1);
-		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_6, 4, INSTANCE_DATA_LENGTH, 24, 1);
-		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_7, 4, INSTANCE_DATA_LENGTH, 28, 1);
-		
-//		vbo.nextAttribute(modelData.getVAOId(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_0, 4, 1);
-//		vbo.nextAttribute(modelData.getVAOId(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_1, 4, 1);
-//		vbo.nextAttribute(modelData.getVAOId(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_2, 4, 1);
-//		vbo.nextAttribute(modelData.getVAOId(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_3, 4, 1);
-		
-//		vbo.nextAttribute(modelData.getVAOId(), TestInstanceShader.ATTRIBUTE_LOC_COLOR, 3, 1);
+		vbo.nextAttribute(modelData.getVAOId(), TestInstanceShader.ATTRIBUTE_LOC_OFFSET, 3, 1);
 	}
 	
 	public void render(TestInstanceRenderProperties properties, Camera camera) {

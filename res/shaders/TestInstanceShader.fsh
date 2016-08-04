@@ -1,11 +1,12 @@
 #version 400 core
 
-in vec4 color;
+in vec2 texCoordPass;
+in vec3 surfaceNormal;
 
-out vec4 outColor;
+out vec4 color_out;
 
-//uniform sampler2D texture0;
+uniform sampler2D texture0;
 
-void main() {
-	outColor = color; //vec4(1, 0, 0, 1);
+void main(void) {
+	color_out = texture(texture0, texCoordPass + (surfaceNormal * 0).xy);
 }

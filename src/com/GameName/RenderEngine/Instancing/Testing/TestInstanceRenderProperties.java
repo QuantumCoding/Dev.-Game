@@ -1,19 +1,20 @@
 package com.GameName.RenderEngine.Instancing.Testing;
 
 import com.GameName.RenderEngine.Util.RenderProperties;
-import com.GameName.RenderEngine.Util.RenderStructs.Transform;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class TestInstanceRenderProperties extends RenderProperties {
+	private Vector3f offset;
 	
-	public TestInstanceRenderProperties() { 
-		super();
+	public TestInstanceRenderProperties(Vector3f offset) { 
+		super(null);
+		
+		this.offset = offset;
 	}
 	
-	public TestInstanceRenderProperties(Transform transform) { 
-		super(transform);
-	}
+	public Vector3f getOffset() { return offset; } 
 	
 	public RenderProperties clone() {
-		return new TestInstanceRenderProperties(getTransform().clone());
+		return new TestInstanceRenderProperties(offset);
 	}
 }
