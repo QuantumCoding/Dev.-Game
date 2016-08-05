@@ -8,7 +8,8 @@ public class TestInstanceShader extends Shader {
 	private static final String VERTEX_SHADER_LOC = "res/shaders/TestInstanceShader.vsh";
 	private static final String FRAGMENT_SHADER_LOC = "res/shaders/TestInstanceShader.fsh";
 
-	public static final int ATTRIBUTE_LOC_OFFSET = 3;
+	public static final int ATTRIBUTE_LOC_COLOR_OFFSET = 3;
+	public static final int ATTRIBUTE_LOC_OFFSET = 4;
 	
 	private int location_projectionMatrix;
 	private int location_viewMatrix;
@@ -35,6 +36,7 @@ public class TestInstanceShader extends Shader {
 		super.bindAttribute(ATTRIBUTE_LOC_TEXCOORDS, "texCoord");
 		super.bindAttribute(ATTRIBUTE_LOC_NORMALS,   "normal");
 
+		super.bindAttribute(ATTRIBUTE_LOC_OFFSET, "color");
 		super.bindAttribute(ATTRIBUTE_LOC_OFFSET, "offset");
 		
 		super.loadInt(location_texture0, 0);

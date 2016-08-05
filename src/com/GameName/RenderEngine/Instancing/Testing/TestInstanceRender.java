@@ -9,8 +9,8 @@ import com.GameName.RenderEngine.Util.Camera;
 
 public class TestInstanceRender implements IRenderableInstance<TestInstanceRenderProperties> {
 	
-	public static final int MAX_RENDER_COUNT = 1000;
-	public static final int INSTANCE_DATA_LENGTH = 3;//16;
+	public static final int MAX_RENDER_COUNT = 100000;
+	public static final int INSTANCE_DATA_LENGTH = 19;
 	
 	private Shader shader;
 	private ModelData modelData;
@@ -28,8 +28,13 @@ public class TestInstanceRender implements IRenderableInstance<TestInstanceRende
 //		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_1, 4, INSTANCE_DATA_LENGTH, 4, 1);
 //		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_2, 4, INSTANCE_DATA_LENGTH, 8, 1);
 //		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), TestInstanceShader.ATTRIBUTE_LOC_MATRIX_3, 4, INSTANCE_DATA_LENGTH, 12, 1);
+
+		vbo.nextAttribute(modelData.getVAOId(), TestInstanceShader.ATTRIBUTE_LOC_COLOR_OFFSET, 3, 1);
 		
-		vbo.nextAttribute(modelData.getVAOId(), TestInstanceShader.ATTRIBUTE_LOC_OFFSET, 3, 1);
+		vbo.nextAttribute(modelData.getVAOId(), TestInstanceShader.ATTRIBUTE_LOC_OFFSET + 0, 4, 1);
+		vbo.nextAttribute(modelData.getVAOId(), TestInstanceShader.ATTRIBUTE_LOC_OFFSET + 1, 4, 1);
+		vbo.nextAttribute(modelData.getVAOId(), TestInstanceShader.ATTRIBUTE_LOC_OFFSET + 2, 4, 1);
+		vbo.nextAttribute(modelData.getVAOId(), TestInstanceShader.ATTRIBUTE_LOC_OFFSET + 3, 4, 1);
 	}
 	
 	public void render(TestInstanceRenderProperties properties, Camera camera) {

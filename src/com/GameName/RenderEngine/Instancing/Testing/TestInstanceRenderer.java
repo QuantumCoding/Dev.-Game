@@ -20,9 +20,9 @@ public class TestInstanceRenderer extends InstanceRenderer<TestInstanceRender, T
 	public void prepInstanceVBO(InstanceVBO vbo, TestInstanceRender testInstanceRender) {
 		TestInstanceShader shader = (TestInstanceShader) super.getShader();
 		shader.bind();
-
+		
 		for(TestInstanceRenderProperties property : renders.get(testInstanceRender)) {
-			vbo.putAll(property.getOffset());
+			vbo.putAll(property.getColor(), property.getTransform().getTransformMatrix());
 		}
 	}
 
@@ -45,15 +45,25 @@ public class TestInstanceRenderer extends InstanceRenderer<TestInstanceRender, T
 		glEnableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_TEXCOORDS);
 		glEnableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_NORMALS);
 		
-		glEnableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_OFFSET);
+		glEnableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_COLOR_OFFSET);
+		
+		glEnableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_OFFSET + 0);
+		glEnableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_OFFSET + 1);
+		glEnableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_OFFSET + 2);
+		glEnableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_OFFSET + 3);
 	}
 	
 	protected void revertOpenGL() {
 	    glDisableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_POSITIONS);     
 		glDisableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_TEXCOORDS);      
 		glDisableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_NORMALS);   
+
+		glDisableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_COLOR_OFFSET); 
 		
-		glDisableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_OFFSET);      
+		glDisableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_OFFSET + 0); 
+		glDisableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_OFFSET + 1); 
+		glDisableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_OFFSET + 2); 
+		glDisableVertexAttribArray(TestInstanceShader.ATTRIBUTE_LOC_OFFSET + 3); 
 	}
 
 	public boolean isAcceptedShader(Shader shader) {
