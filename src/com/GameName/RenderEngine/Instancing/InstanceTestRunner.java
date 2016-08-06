@@ -67,33 +67,34 @@ public class InstanceTestRunner {
 		
 		double frameTimeAvg = 0.0;
 		int frameAvgCounter = 0;
-//		int i = 0;
+		int i = 0;
 		
 		camera.z = -50;
 		camera.rotY = 180;
 		camera.y = 25;
 		
-//		boolean reverse = false;
+		boolean reverse = false;
 		
 		instanceRenderer.setRenderBehind(true);
 		while(!window.isCloseRequested()) {
 			move(window, camera);
 			
-//			i += reverse ? 200 : -200;
-//			if(Math.abs(i) > offsets.length) reverse = !reverse;
-//			i %= offsets.length;
-//			int index = 0;
+			i += reverse ? 50 : -50;
+			if(i < -offsets.length) reverse = true;
+			if(i > 0) reverse = false;
+//			i %= offsets.length * 2;
+			int index = 0;
 			for(TestInstanceRenderProperties offset : offsets) {
 //				TestInstanceRenderProperties property = new TestInstanceRenderProperties(offset);
 
-//				int j = i + index ++; //j %= offsets.length;
+				int j = i + index ++; //j %= offsets.length;
 				
 //				if(offset.getTransform().getTranslation().lessThenOrEqual(0, -.1f, 0)) continue;
 //				offset.getTransform().setRotation(offset.getTransform().getRotation().add(10f));
 				
-//				offset.getTransform().setTranslation(
-//						new Vector3f(Math.cos(Math.toRadians(j % 360)), 1, Math.sin(Math.toRadians(j % 360)))
-//						.multiply(new Vector3f(Math.sin(j / 1000.0f), 1, Math.cos(j / 1000.0f)).multiply(j/500.0f)));
+				offset.getTransform().setTranslation(
+						new Vector3f(Math.cos(Math.toRadians(j % 360)), 1, Math.sin(Math.toRadians(j % 360)))
+						.multiply(new Vector3f(Math.sin(j / 1000.0f), 1, Math.cos(j / 1000.0f)).multiply(j/500.0f)));
 				
 				if(offset.getTransform().getTranslation().anyLessThenOrEqual(-1000, -.01f, -1000)) continue;
 					

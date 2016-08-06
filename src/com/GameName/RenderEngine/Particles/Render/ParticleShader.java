@@ -8,14 +8,11 @@ public class ParticleShader extends Shader {
 	private static final String VERTEX_SHADER_LOC = "res/shaders/ParticleShader.vsh";
 	private static final String FRAGMENT_SHADER_LOC = "res/shaders/ParticleShader.fsh";
 
-	public static final int ATTRIBUTE_LOC_MODLE_VIEW_MAT_COL_0 = 2;
-	public static final int ATTRIBUTE_LOC_MODLE_VIEW_MAT_COL_1 = 3;
-	public static final int ATTRIBUTE_LOC_MODLE_VIEW_MAT_COL_2 = 4;
-	public static final int ATTRIBUTE_LOC_MODLE_VIEW_MAT_COL_3 = 5;
+	public static final int ATTRIBUTE_LOC_OFFSET = 3;
+	public static final int ATTRIBUTE_LOC_TEX_COORD_SCALE = 4;
+	public static final int ATTRIBUTE_LOC_BLEND_VALUE = 5;
 	
-	public static final int ATTRIBUTE_LOC_OFFSET = 6;
-	public static final int ATTRIBUTE_LOC_TEX_COORD_SCALE = 7;
-	public static final int ATTRIBUTE_LOC_BLEND_VALUE = 8;
+	public static final int ATTRIBUTE_LOC_MODLE_VIEW_MAT = 6;
 	
 	private int location_projectionMatrix;
 	private int location_texture0;
@@ -36,12 +33,12 @@ public class ParticleShader extends Shader {
 		
 		super.bindAttribute(ATTRIBUTE_LOC_POSITIONS, "position");
 		super.bindAttribute(ATTRIBUTE_LOC_TEXCOORDS, "texCoord");
-		
-		super.bindAttribute(ATTRIBUTE_LOC_MODLE_VIEW_MAT_COL_0, "modelViewMatrix");
-		
+
 		super.bindAttribute(ATTRIBUTE_LOC_OFFSET, "offset");
 		super.bindAttribute(ATTRIBUTE_LOC_TEX_COORD_SCALE, "texCoordScale");
 		super.bindAttribute(ATTRIBUTE_LOC_BLEND_VALUE, "blendValue");
+		
+		super.bindAttribute(ATTRIBUTE_LOC_MODLE_VIEW_MAT, "modelViewMatrix");
 
 		super.loadInt(location_texture0, 0);
 	}

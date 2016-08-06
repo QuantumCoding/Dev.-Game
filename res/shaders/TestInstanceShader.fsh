@@ -10,5 +10,5 @@ uniform sampler2D texture0;
 
 void main(void) {
 	color_out = texture(texture0, texCoordPass + (surfaceNormal * 0).xy);
-	color_out = mix(color_out, vec4(colorOff, 1), .25);
+	color_out = mix(color_out, vec4(colorOff, 1), 0);
 }

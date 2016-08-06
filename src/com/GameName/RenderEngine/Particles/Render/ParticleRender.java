@@ -15,10 +15,10 @@ public class ParticleRender implements IRenderableInstance<ParticleRenderPropert
 		 0.5f, -0.5f,	 0.5f,  0.5f,
 	};
 	
-//	private static final float[] TEX_COORDS = {
-//		0.0f, 0.0f,		0.0f, 1.0f,
-//		1.0f, 1.0f,		1.0f, 0.0f,
-//	};
+	private static final float[] TEX_COORDS = {
+		0.0f, 0.0f,		0.0f, 1.0f,
+		1.0f, 1.0f,		1.0f, 0.0f,
+	};
 	
 	private static final int[] INDICES = {
 		0, 1, 2,	0, 2, 3 
@@ -29,12 +29,12 @@ public class ParticleRender implements IRenderableInstance<ParticleRenderPropert
 	static {
 		modelData = new ModelData(10, 1000, new Vector3f());
 		modelData.storeDataInAttributeList(Shader.ATTRIBUTE_LOC_POSITIONS, 2, VERTICES, false);
-//		modelData.storeDataInAttributeList(Shader.ATTRIBUTE_LOC_TEXCOORDS, 2, TEX_COORDS, false);
+		modelData.storeDataInAttributeList(Shader.ATTRIBUTE_LOC_TEXCOORDS, 2, TEX_COORDS, false);
 		modelData.loadIndicies(INDICES);
 	}
 	
-	public static final int MAX_PARTICLE_COUNT = 10;
-	public static final int INSTANCE_DATA_LENGTH = 19;
+	public static final int MAX_PARTICLE_COUNT = 100;
+	public static final int INSTANCE_DATA_LENGTH = 22;
 	
 	private Shader shader;
 	private Renderer<ParticleRender, ParticleRenderProperties> renderer;
@@ -57,13 +57,16 @@ public class ParticleRender implements IRenderableInstance<ParticleRenderPropert
 //		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), 6, 4, INSTANCE_DATA_LENGTH, 16, 1);
 //		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), 7, 1, INSTANCE_DATA_LENGTH, 20, 1);
 //		InstanceUtil.addInstanceAttribute(modelData.getVAOId(), vbo.getVBO(), 8, 1, INSTANCE_DATA_LENGTH, 21, 1);
+
+		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_OFFSET, 4, 1);
+		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_TEX_COORD_SCALE, 1, 1);
+		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_BLEND_VALUE, 1, 1);
 		
-		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT_COL_0, 4, 1);
-		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT_COL_1, 4, 1);
-		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT_COL_2, 4, 1);
-		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT_COL_3, 4, 1);
+		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT + 0, 4, 1);
+		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT + 1, 4, 1);
+		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT + 2, 4, 1);
+		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT + 3, 4, 1);
 		
-		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT_COL_3 + 1, 3, 1);
 
 //		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_OFFSET, 4, 1);
 //		vbo.nextAttribute(modelData.getVAOId(), ParticleShader.ATTRIBUTE_LOC_TEX_COORD_SCALE, 1, 1);

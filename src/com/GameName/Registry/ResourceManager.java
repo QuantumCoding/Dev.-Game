@@ -64,6 +64,7 @@ public class ResourceManager implements ICubeRegister, ICommandRegister,
 	public void registerShaders() {
 		ShaderRegistry.registerShader(Shaders.DefaultShader);
 		ShaderRegistry.registerShader(Shaders.ParticleShader);
+		ShaderRegistry.registerShader(Shaders.ParticleNonShader);
 		ShaderRegistry.registerShader(Shaders.WorldShader);
 		
 		ShaderRegistry.registerShader(Shaders.TestInstanceShader);
@@ -102,6 +103,7 @@ public class ResourceManager implements ICubeRegister, ICommandRegister,
 	public static final class Shaders {
 		public static final Shader DefaultShader = new DefaultShader();
 		public static final Shader ParticleShader = new ParticleShader();
+		public static final Shader ParticleNonShader = new com.GameName.RenderEngine.Particles_NonInst.Render.ParticleShader();
 		public static final Shader WorldShader = new WorldShader();
 		
 		public static final Shader TestInstanceShader = new TestInstanceShader();

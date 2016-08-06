@@ -1,5 +1,6 @@
 package com.GameName.RenderEngine.Particles.Render;
 
+import static org.lwjgl.opengl.GL11.GL_ONE;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -19,7 +20,8 @@ import com.GameName.RenderEngine.Instancing.InstanceVBO;
 import com.GameName.RenderEngine.Particles.Texture.ParticleTexture;
 import com.GameName.RenderEngine.Shaders.Shader;
 import com.GameName.Util.Vectors.MatrixUtil;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.Vector2f;
+import com.GameName.Util.Vectors.Vector4f;
 
 public class ParticleRenderer extends InstanceRenderer<ParticleRender, ParticleRenderProperties> {
 	public ParticleRenderer(Shader shader) {
@@ -33,13 +35,15 @@ public class ParticleRenderer extends InstanceRenderer<ParticleRender, ParticleR
 		for(ParticleRenderProperties property : renders.get(particleRender)) {
 			Matrix4f modelViewMatrix = MatrixUtil.createModelViewMatrix(property.getTransform(), Shader.getViewMatrix());
 			
-//			ParticleTexture texture = property.getTexture();
-//			Vector2f offset1 = texture.getOffset(property.getTextureAtlasIndex());
-//			Vector2f offset2 = texture.getOffset(property.getTextureAtlasIndex() < 
-//					Math.pow(texture.getNumberOfRows(), 2) - 1 ? 
-//						property.getTextureAtlasIndex() + 1 : property.getTextureAtlasIndex());
+			ParticleTexture texture = property.getTexture();
+			Vector2f offset1 = texture.getOffset(property.getTextureAtlasIndex());
+			Vector2f offset2 = texture.getOffset(property.getTextureAtlasIndex() < 
+					Math.pow(texture.getNumberOfRows(), 2) - 1 ? 
+						property.getTextureAtlasIndex() + 1 : property.getTextureAtlasIndex());
 			
-			vbo.putAll(modelViewMatrix, Vector3f.random(1));
+			vbo.putAll(new Vector4f(offset1, offset2.x, offset2.y), 
+					texture.getNumberOfRows() * ParticleTexture.getRegistry().getImageSize() / texture.getSize().x,
+					property.getBlendValue(), modelViewMatrix);
 					
 //						offset1, offset2, property.getBlendValue(),
 //					texture.getNumberOfRows() * ParticleTexture.getRegistry().getImageSize() / texture.getSize().x);
@@ -53,10 +57,10 @@ public class ParticleRenderer extends InstanceRenderer<ParticleRender, ParticleR
 		shader.loadProjectionMatrix(Shader.getProjectionMatrix());
 		ParticleTexture.getRegistry().getTextureMap().bind(0);
 		
-//		if(particleRender.usingAdditive()) 
-//			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-//		else
-//			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		if(particleRender.usingAdditive()) 
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		else
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 		glBindVertexArray(particleRender.getModelData().getVAOId());
 		glDrawElementsInstanced(GL_TRIANGLES, particleRender.getModelData().getIndiceCount(), 
@@ -68,31 +72,35 @@ public class ParticleRenderer extends InstanceRenderer<ParticleRender, ParticleR
 	protected void prepareOpenGL() {
 		glDepthMask(false);
 		
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-		glEnableVertexAttribArray(3);
-		glEnableVertexAttribArray(4);
-		glEnableVertexAttribArray(5);
-		glEnableVertexAttribArray(6);
-		glEnableVertexAttribArray(7);
-		glEnableVertexAttribArray(8);
+		glEnableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_POSITIONS);
+		glEnableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_TEXCOORDS);
+		
+		glEnableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_OFFSET);
+		glEnableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_TEX_COORD_SCALE);
+		glEnableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_BLEND_VALUE);
+		
+		glEnableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT + 0);
+		glEnableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT + 1);
+		glEnableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT + 2);
+		glEnableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT + 3);
 	}
 	
 	protected void revertOpenGL() {
 		glDepthMask(true);
 
 	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	    
-	    glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(2);
-		glDisableVertexAttribArray(3);
-		glDisableVertexAttribArray(4);
-		glDisableVertexAttribArray(5);
-		glDisableVertexAttribArray(6);
-		glDisableVertexAttribArray(7);
-		glDisableVertexAttribArray(8);
+		
+		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_POSITIONS);
+		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_TEXCOORDS);
+
+		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_OFFSET);
+		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_TEX_COORD_SCALE);
+		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_BLEND_VALUE);
+
+		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT + 0);
+		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT + 1);
+		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT + 2);
+		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODLE_VIEW_MAT + 3);
 	}
 
 	public boolean isAcceptedShader(Shader shader) {

@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
 
 import com.GameName.Input.TemporaryControlAdder;
+import com.GameName.Particles.ParticleEmitterNon;
 import com.GameName.Registry.ResourceManager;
 import com.GameName.Registry.ResourceManager.Worlds;
 import com.GameName.Registry.Interfaces.ISetup;
@@ -17,8 +19,12 @@ import com.GameName.Registry.Registries.EntityRegistry;
 import com.GameName.Registry.Registries.ShaderRegistry;
 import com.GameName.Registry.Registries.ThreadRegistry;
 import com.GameName.Registry.Registries.WorldRegistry;
+import com.GameName.RenderEngine.Particles_NonInst.Particle;
+import com.GameName.RenderEngine.Particles_NonInst.ParticleManager;
+import com.GameName.RenderEngine.Particles_NonInst.Texture.ParticleTexture;
 import com.GameName.RenderEngine.Util.Camera;
 import com.GameName.RenderEngine.Window.Window;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class GameName_New implements ISetup {
 	private static final String VERSION = "In-Dev";
@@ -119,16 +125,49 @@ public class GameName_New implements ISetup {
 		
 //		engine.getPlayer().reset();
 		
+//		ParticleManager manager = new ParticleManager();
+//		ParticleEmitter emitter = null;
+//		try {
+//			emitter = new ParticleEmitter(manager, new Vector3f(5),
+//					ParticleTexture.getRegistry().registerTexture(4, new File("res/textures/ParticleD.png")), 
+//					5, false);
+//		} catch(IOException e) {
+//			e.printStackTrace();
+//		}
+		
+		ParticleTexture texture = null; // particleStar
+		try { texture = ParticleTexture.getRegistry().registerTexture(4, new File("res/textures/ParticleD.png")); } 
+		catch(IOException e) { e.printStackTrace(); }
+		texture.setAdditvieBlending(false);
+		
+		ParticleTexture.getRegistry().compressTexture();
+		
+		ParticleManager manager = new ParticleManager();
+		ParticleEmitterNon emitter = new ParticleEmitterNon(manager, new Vector3f(2), texture, 0.001f, false);
+		
 		double frameTimeAvg = 0.0;
 		int frameAvgCounter = 0;
 		
 		while(isRunning && !window.isCloseRequested()) {
 			Camera camera = engine.getPlayer().getCamera();
+
+//			emitter.update(1);
+//			manager.update(1, camera);
+			
+			if(Keyboard.isKeyDown(Keyboard.KEY_U)) {
+				manager.addParticle(new Particle(new Vector3f(2), (float) (Math.random() * 360), Vector3f.random(1), 
+						Vector3f.random(6).subtract(3, 0, 3), new Vector3f().randomize(2).multiply(-1), 10, texture));
+			}
+			
+			emitter.update((float) window.getFrameTime());
+			manager.update((float) window.getFrameTime(), camera);
 			
 			engine.getInputHandeler().checkControls();
 			engine.getWorld().getChunkLoader().update();
 				
-			engine.getWorld().render(camera);
+
+			manager.render(camera);
+//			engine.getWorld().render(camera);
 			engine.getRender().render(camera);		
 			
 			window.update();
@@ -146,6 +185,8 @@ public class GameName_New implements ISetup {
 			}		
 		}		
 
+		manager.cleanUp();
+		
 //		FPS_Thread.interrupt();
 //		engine.getThreads().stopAll();
 	}
