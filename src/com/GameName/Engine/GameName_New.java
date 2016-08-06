@@ -10,7 +10,7 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 
 import com.GameName.Input.TemporaryControlAdder;
-import com.GameName.Particles.ParticleEmitterNon;
+import com.GameName.Particles.ParticleEmitter;
 import com.GameName.Registry.ResourceManager;
 import com.GameName.Registry.ResourceManager.Worlds;
 import com.GameName.Registry.Interfaces.ISetup;
@@ -19,9 +19,9 @@ import com.GameName.Registry.Registries.EntityRegistry;
 import com.GameName.Registry.Registries.ShaderRegistry;
 import com.GameName.Registry.Registries.ThreadRegistry;
 import com.GameName.Registry.Registries.WorldRegistry;
-import com.GameName.RenderEngine.Particles_NonInst.Particle;
-import com.GameName.RenderEngine.Particles_NonInst.ParticleManager;
-import com.GameName.RenderEngine.Particles_NonInst.Texture.ParticleTexture;
+import com.GameName.RenderEngine.Particles.Particle;
+import com.GameName.RenderEngine.Particles.ParticleManager;
+import com.GameName.RenderEngine.Particles.Texture.ParticleTexture;
 import com.GameName.RenderEngine.Util.Camera;
 import com.GameName.RenderEngine.Window.Window;
 import com.GameName.Util.Vectors.Vector3f;
@@ -138,16 +138,17 @@ public class GameName_New implements ISetup {
 		ParticleTexture texture = null; // particleStar
 		try { texture = ParticleTexture.getRegistry().registerTexture(4, new File("res/textures/ParticleD.png")); } 
 		catch(IOException e) { e.printStackTrace(); }
-		texture.setAdditvieBlending(false);
+		texture.setAdditvieBlending(true);
 		
 		ParticleTexture.getRegistry().compressTexture();
 		
 		ParticleManager manager = new ParticleManager();
-		ParticleEmitterNon emitter = new ParticleEmitterNon(manager, new Vector3f(2), texture, 0.001f, false);
+		ParticleEmitter emitter = new ParticleEmitter(manager, new Vector3f(2), texture, 0.0001f, false);
 		
 		double frameTimeAvg = 0.0;
 		int frameAvgCounter = 0;
 		
+//		float i = 0, j = 0;
 		while(isRunning && !window.isCloseRequested()) {
 			Camera camera = engine.getPlayer().getCamera();
 
@@ -159,6 +160,7 @@ public class GameName_New implements ISetup {
 						Vector3f.random(6).subtract(3, 0, 3), new Vector3f().randomize(2).multiply(-1), 10, texture));
 			}
 			
+//			emitter.setPosition(new Vector3f(Math.sin(i += Math.random() / 10 - .05), 2, Math.cos(j += Math.random() / 10 - .05)).multiply(5, 1, 10));
 			emitter.update((float) window.getFrameTime());
 			manager.update((float) window.getFrameTime(), camera);
 			
@@ -167,7 +169,7 @@ public class GameName_New implements ISetup {
 				
 
 			manager.render(camera);
-//			engine.getWorld().render(camera);
+			engine.getWorld().render(camera);
 			engine.getRender().render(camera);		
 			
 			window.update();
@@ -184,8 +186,6 @@ public class GameName_New implements ISetup {
 				frameAvgCounter ++;
 			}		
 		}		
-
-		manager.cleanUp();
 		
 //		FPS_Thread.interrupt();
 //		engine.getThreads().stopAll();

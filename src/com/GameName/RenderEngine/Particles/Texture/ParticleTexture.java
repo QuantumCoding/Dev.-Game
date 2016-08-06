@@ -10,6 +10,8 @@ public class ParticleTexture {
 	private Vector2f textureSize;
 	private int numberOfRows;
 	
+	private boolean additiveBlending;
+	
 	protected ParticleTexture(int textureIndex, Vector2f textureSize, int numberOfRows) {
 		this.textureIndex = textureIndex;
 		this.textureSize = textureSize;
@@ -24,6 +26,11 @@ public class ParticleTexture {
 				.multiply(textureSize).add(offest).divide(registry.getImageSize());
 	}
 
+	public void setAdditvieBlending(boolean additiveBlending) {
+		this.additiveBlending = additiveBlending;
+	}
+	
+	public boolean additiveBlending() { return additiveBlending; }
 	public int getNumberOfRows() { return numberOfRows; }
 	public Vector2f getSize() { return textureSize; }
 	

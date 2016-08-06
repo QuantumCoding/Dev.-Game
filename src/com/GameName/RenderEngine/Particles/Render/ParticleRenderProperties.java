@@ -3,37 +3,43 @@ package com.GameName.RenderEngine.Particles.Render;
 import com.GameName.RenderEngine.Particles.Texture.ParticleTexture;
 import com.GameName.RenderEngine.Util.RenderProperties;
 import com.GameName.RenderEngine.Util.RenderStructs.Transform;
+import com.GameName.Util.Vectors.Vector2f;
 
 public class ParticleRenderProperties extends RenderProperties {
-
+	
+	private boolean useAdditiveBlending;
 	private ParticleTexture texture;
-	private int textureIndex;
-	private float blendValue;
 	
-	public ParticleRenderProperties(ParticleTexture texture) { 
-		this(new Transform(), texture, 0, 0);
+	private Vector2f offset1, offset2;
+	private float textureDivisor;
+	private float blend;
+
+	public ParticleRenderProperties(Transform transform, ParticleTexture texture, boolean useAdditiveBlending, int index1, int index2, float blend) {
+		this(transform, texture, useAdditiveBlending, texture.getOffset(index1), texture.getOffset(index2), blend);
 	}
 	
-	public ParticleRenderProperties(ParticleTexture texture, int textureIndex, float blendValue) { 
-		this(new Transform(), texture, textureIndex, blendValue);
-	}
-	
-	public ParticleRenderProperties(Transform transform, ParticleTexture texture) { 
-		this(transform, texture, 0, 0);
-	}
-	
-	public ParticleRenderProperties(Transform transform, ParticleTexture texture, int textureIndex, float blendValue) {
-		super(transform); 
+	public ParticleRenderProperties(Transform transform, ParticleTexture texture, boolean useAdditiveBlending, Vector2f offset1, Vector2f offset2, float blend) {
+		super(transform);
+		
 		this.texture = texture;
-		this.textureIndex = textureIndex;
-		this.blendValue = blendValue;
+		this.useAdditiveBlending = useAdditiveBlending;
+		
+		this.blend = blend;
+		this.offset1 = offset1;
+		this.offset2 = offset2;
+		
+		this.textureDivisor = texture.getNumberOfRows();// * ParticleTexture.getRegistry().getImageSize();
 	}
 	
-	public ParticleTexture getTexture() { return texture; }
-	public int getTextureAtlasIndex() { return textureIndex; }
-	public float getBlendValue() { return blendValue; }
+	public boolean usingAdditive() { return useAdditiveBlending; }
+	public ParticleTexture getTexture() { return texture; } 
 	
-	public RenderProperties clone() {
-		return new ParticleRenderProperties(getTransform().clone(), texture.clone(), textureIndex, blendValue);
+	public float getTextureDivisor() { return textureDivisor; }
+	public Vector2f getOffset1() { return offset1; }
+	public Vector2f getOffset2() { return offset2; }
+	public float getBlend() { return blend; }
+
+	public ParticleRenderProperties clone() {
+		return new ParticleRenderProperties(getTransform().clone(), texture.clone(), useAdditiveBlending, offset1.clone(), offset2.clone(), blend);
 	}
 }

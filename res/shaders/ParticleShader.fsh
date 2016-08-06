@@ -1,18 +1,18 @@
-#version 400 core
+#version 140
 
-in vec2 texCoordPass1;
-in vec2 texCoordPass2;
+in vec2 textureCoord1;
+in vec2 textureCoord2;
+in float blend;
 
-in float blendValuePass;
-
-out vec4 outColor;
+out vec4 out_colour;
 
 uniform sampler2D texture0;
 
-void main() {
-	vec4 textureSample1 = texture(texture0, texCoordPass1);
-	vec4 textureSample2 = texture(texture0, texCoordPass2);
-	vec4 ummmm = mix(textureSample1, textureSample2, blendValuePass);
-	
-	outColor = mix(textureSample1, textureSample2, blendValuePass);
+void main(void) {
+
+	vec4 sample1 = texture(texture0, textureCoord1);
+	vec4 sample2 = texture(texture0, textureCoord2);
+
+	out_colour = mix(sample1, sample2, blend);
+
 }

@@ -1,26 +1,26 @@
-#version 400 core
+#version 140
 
 in vec2 position;
 in vec2 texCoord;
 
+in vec2 texOffset1;
+in vec2 texOffset2;
+
+in float textureDivisor;
+in float blendFactor;
+
 in mat4 modelViewMatrix;
 
-in vec4 offset;
-in float texCoordScale;
-in float blendValue;
-
-out vec2 texCoordPass1;
-out vec2 texCoordPass2;
-out float blendValuePass;
+out vec2 textureCoord1;
+out vec2 textureCoord2;
+out float blend;
 
 uniform mat4 projectionMatrix;
 
-void main() {
-	vec4 clacl = projectionMatrix * modelViewMatrix * vec4(position, 0, 1.0);
-	gl_Position = vec4(position, 0, 1); //projectionMatrix * modelViewMatrix * vec4(position, 0, 1.0);
+void main(void) {
+	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 0.0, 1.0);
 	
-	texCoordPass1 = (texCoord / texCoordScale) + offset.xy;
-	texCoordPass2 = (texCoord / texCoordScale) + offset.zw;
-	
-	blendValuePass = blendValue;
+	textureCoord1 = (texCoord / textureDivisor) + texOffset1;
+	textureCoord2 = (texCoord / textureDivisor) + texOffset2;
+	blend = blendFactor;
 }

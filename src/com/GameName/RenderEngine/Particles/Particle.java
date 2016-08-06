@@ -17,12 +17,11 @@ public class Particle {
 	private float elapsedTime;
 	
 	private ParticleTexture texture;
-	private int textureIndex;
 
 	private float distanceFromCamera;
 	private boolean additiveBlending;
 	
-	public Particle(Vector3f position, float rotation, Vector3f scale, Vector3f velocity, Vector3f gravity, float timeAlive, ParticleTexture texture, boolean additiveBlending) {
+	public Particle(Vector3f position, float rotation, Vector3f scale, Vector3f velocity, Vector3f gravity, float timeAlive, ParticleTexture texture) {
 		this.position = position;
 		this.rotation = rotation;
 		this.scale = scale;
@@ -30,9 +29,7 @@ public class Particle {
 		this.gravity = gravity;
 		this.timeAlive = timeAlive;
 		this.texture = texture;
-		this.additiveBlending = additiveBlending;
-		
-		this.textureIndex = -1;
+		this.additiveBlending = texture == null || texture.additiveBlending();
 	}
 	
 	public boolean update(float delta, Camera camera) {
@@ -45,10 +42,6 @@ public class Particle {
 		return elapsedTime < timeAlive;
 	}
 	
-	public void setTextureIndex(int index) {
-		this.textureIndex = index;
-	} 
-	
 	public Vector3f getPosition() { return position; }
 	public float getRotation() { return rotation; }
 	public Vector3f getScale() { return scale; }
@@ -60,7 +53,6 @@ public class Particle {
 	public float getElapsedTime() { return elapsedTime; }
 
 	public ParticleTexture getTexture() { return texture; }
-	public int getTextureIndex() { return textureIndex; }
 	
 	public float getDistance() { return distanceFromCamera; }
 	public boolean usingAdditive() { return additiveBlending; }

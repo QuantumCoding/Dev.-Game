@@ -1,4 +1,4 @@
-package com.GameName.RenderEngine.Particles_NonInst.Render;
+package com.GameName.RenderEngine.Particles.Render;
 
 import com.GameName.Registry.ResourceManager.Shaders;
 import com.GameName.RenderEngine.Models.Model;
@@ -31,6 +31,6 @@ public class ParticleModel extends Model {
 	
 	public ParticleModel() {
 		super(PARTICLE_MODEL_DATA);
-		setShader(Shaders.ParticleNonShader);
+		setShader(Shaders.ParticleShader);
 	}
 }

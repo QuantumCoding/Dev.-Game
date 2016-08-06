@@ -115,8 +115,8 @@ public abstract class GameNameThread implements Runnable {
 		}
 	}
 	
-	abstract void init();
-	abstract void tick();
+	protected abstract void init();
+	protected abstract void tick();
 
 	public boolean isRunning() { return isRunning; }
 	public boolean isPaused() { return isPaused; }
