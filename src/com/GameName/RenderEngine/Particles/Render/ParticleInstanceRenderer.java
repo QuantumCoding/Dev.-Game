@@ -83,16 +83,16 @@ public class ParticleInstanceRenderer extends InstanceRenderer<ParticleInstanceR
 	    glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_POSITIONS);     
 		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_TEXCOORDS);      
 
-		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_OFFSET_1); 
-		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_OFFSET_2); 
-
-		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_DIVISOR);
-		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_BLEND);
+//		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_OFFSET_1); 
+//		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_OFFSET_2); 
+//
+//		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_DIVISOR);
+//		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_BLEND);
 		
-		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODEL_VIEW + 0); 
-		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODEL_VIEW + 1); 
-		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODEL_VIEW + 2); 
-		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODEL_VIEW + 3); 
+//		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODEL_VIEW + 0); 
+//		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODEL_VIEW + 1); 
+//		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODEL_VIEW + 2); 
+//		glDisableVertexAttribArray(ParticleShader.ATTRIBUTE_LOC_MODEL_VIEW + 3); 
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
@@ -102,6 +102,6 @@ public class ParticleInstanceRenderer extends InstanceRenderer<ParticleInstanceR
 	}
 	
 	public int getRenderStage() {
-		return RenderEngine.RENDER_STEP_ALPHA;
+		return RenderEngine.RENDER_STEP_PRIMARY;
 	}
 }

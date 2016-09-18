@@ -12,6 +12,7 @@ import org.lwjgl.input.Keyboard;
 import com.GameName.Input.TemporaryControlAdder;
 import com.GameName.Particles.ParticleEmitter;
 import com.GameName.Registry.ResourceManager;
+import com.GameName.Registry.ResourceManager.Shaders;
 import com.GameName.Registry.ResourceManager.Worlds;
 import com.GameName.Registry.Interfaces.ISetup;
 import com.GameName.Registry.Registries.CubeRegistry;
@@ -19,10 +20,18 @@ import com.GameName.Registry.Registries.EntityRegistry;
 import com.GameName.Registry.Registries.ShaderRegistry;
 import com.GameName.Registry.Registries.ThreadRegistry;
 import com.GameName.Registry.Registries.WorldRegistry;
+import com.GameName.RenderEngine.Instancing.Testing.TestInstanceRender;
+import com.GameName.RenderEngine.Instancing.Testing.TestInstanceRenderProperties;
+import com.GameName.RenderEngine.Models.SBModel.SBModel;
+import com.GameName.RenderEngine.Models.SBModel.SBModelLoader;
 import com.GameName.RenderEngine.Particles.Particle;
 import com.GameName.RenderEngine.Particles.ParticleManager;
 import com.GameName.RenderEngine.Particles.Texture.ParticleTexture;
+import com.GameName.RenderEngine.Test.TestModel;
+import com.GameName.RenderEngine.Test.TestRenderProperties;
+import com.GameName.RenderEngine.Textures.Texture2D;
 import com.GameName.RenderEngine.Util.Camera;
+import com.GameName.RenderEngine.Util.RenderStructs.Transform;
 import com.GameName.RenderEngine.Window.Window;
 import com.GameName.Util.Vectors.Vector3f;
 
@@ -125,15 +134,34 @@ public class GameName_New implements ISetup {
 		
 //		engine.getPlayer().reset();
 		
-//		ParticleManager manager = new ParticleManager();
-//		ParticleEmitter emitter = null;
-//		try {
-//			emitter = new ParticleEmitter(manager, new Vector3f(5),
-//					ParticleTexture.getRegistry().registerTexture(4, new File("res/textures/ParticleD.png")), 
-//					5, false);
-//		} catch(IOException e) {
-//			e.printStackTrace();
-//		}
+
+		Texture2D spectraTexture = null;
+		try {
+			spectraTexture = new Texture2D(ImageIO.read(new File("res/models/cubeTexture.png")));
+		} catch(IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		SBModel cubeModel = null;
+		try {
+			cubeModel = SBModelLoader.loadSBM(new File("res/models/TexturedCube.sbm"));
+		} catch(IOException e1) {
+			e1.printStackTrace();
+		}
+		TestInstanceRender cubeRender = new TestInstanceRender(Shaders.TestInstanceShader, cubeModel.getModelData());
+		
+		TestInstanceRenderProperties[] offsets = new TestInstanceRenderProperties[1000];
+		int length = 10; float spacing = 1.5f;
+		for(int i = 0; i < offsets.length; i ++) {
+			offsets[i] = new TestInstanceRenderProperties( new Transform(
+					new Vector3f(i%length*2, (i/length)%length*2, i/(length*length)*2).multiply(spacing)
+					.add(new Vector3f(-length, -length, -2 * length).multiply(spacing).add(1.5f).subtract(0, 0, 20)),
+					new Vector3f(), new Vector3f(1)),
+					new Vector3f(0.75f));
+		}
+		
+		TestModel model = new TestModel();
+		TestRenderProperties properties = new TestRenderProperties(new Transform());
 		
 		ParticleTexture texture = null; // particleStar
 		try { texture = ParticleTexture.getRegistry().registerTexture(4, new File("res/textures/ParticleD.png")); } 
@@ -142,25 +170,27 @@ public class GameName_New implements ISetup {
 		
 		ParticleTexture.getRegistry().compressTexture();
 		
-		ParticleManager manager = new ParticleManager();
-		ParticleEmitter emitter = new ParticleEmitter(manager, new Vector3f(2), texture, 0.0001f, false);
+		ParticleManager manager = engine.getRender().getParticleManager();
+		ParticleEmitter emitter = new ParticleEmitter(manager, new Vector3f(-5), texture, 0.00005f, false);
 		
 		double frameTimeAvg = 0.0;
 		int frameAvgCounter = 0;
 		
+		manager.addParticle(new Particle(new Vector3f(2), (float) (Math.random() * 360), Vector3f.random(1), 
+				Vector3f.random(6).subtract(3, 0, 3), new Vector3f().randomize(2).multiply(-1), 10, texture));
+		
+		engine.getPlayer().getCamera().x = -0.5f;
+		engine.getPlayer().getCamera().z = 2;
+		
 //		float i = 0, j = 0;
 		while(isRunning && !window.isCloseRequested()) {
 			Camera camera = engine.getPlayer().getCamera();
-
-//			emitter.update(1);
-//			manager.update(1, camera);
 			
 			if(Keyboard.isKeyDown(Keyboard.KEY_U)) {
 				manager.addParticle(new Particle(new Vector3f(2), (float) (Math.random() * 360), Vector3f.random(1), 
 						Vector3f.random(6).subtract(3, 0, 3), new Vector3f().randomize(2).multiply(-1), 10, texture));
 			}
 			
-//			emitter.setPosition(new Vector3f(Math.sin(i += Math.random() / 10 - .05), 2, Math.cos(j += Math.random() / 10 - .05)).multiply(5, 1, 10));
 			emitter.update((float) window.getFrameTime());
 			manager.update((float) window.getFrameTime(), camera);
 			
@@ -168,8 +198,16 @@ public class GameName_New implements ISetup {
 			engine.getWorld().getChunkLoader().update();
 				
 
+			model.render(properties, camera);
 			manager.render(camera);
+			
 			engine.getWorld().render(camera);
+			
+			for(TestInstanceRenderProperties offset : offsets) {
+				cubeRender.render(offset, camera);
+			}
+
+//			spectraTexture.bind();
 			engine.getRender().render(camera);		
 			
 			window.update();

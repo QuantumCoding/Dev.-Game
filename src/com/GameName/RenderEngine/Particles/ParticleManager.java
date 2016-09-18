@@ -40,6 +40,7 @@ public class ParticleManager {
 	}
 	
 	public void render(Camera camera) {
+		model = new ParticleInstanceRender(Shaders.ParticleShader);
 		for(Particle particle : particles) {
 			float normalTime = particle.getElapsedTime() / particle.getTimeAlive();
 			int indexCount = particle.getTexture().getNumberOfRows() * particle.getTexture().getNumberOfRows();

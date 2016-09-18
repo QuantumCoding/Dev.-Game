@@ -20,6 +20,7 @@ uniform mat4 projectionMatrix;
 void main(void) {
 	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 0.0, 1.0);
 	
+	textureCoord1 = texCoord;
 	textureCoord1 = (texCoord / textureDivisor) + texOffset1;
 	textureCoord2 = (texCoord / textureDivisor) + texOffset2;
 	blend = blendFactor;

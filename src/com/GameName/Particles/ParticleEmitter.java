@@ -33,7 +33,7 @@ public class ParticleEmitter {
 //		System.out.println(elapsedTime);
 		
 		while(elapsedTime >= emitionDelay) {
-			if(manager.getParticleCount() < ParticleManager.PARTICLE_CREATION_CAP)
+			if(manager.getParticleCount() < ParticleManager.PARTICLE_CREATION_CAP) {
 				if(Keyboard.isKeyDown(Keyboard.KEY_P)) {
 					if(other) {
 						for(int i = 0; i < 360; i += 5) {
@@ -68,6 +68,10 @@ public class ParticleEmitter {
 							 shift.multiply(-1).add(0, Math.random() > 0.5 ? 10 : -10, 0), 1.55f, texture);
 					manager.addParticle(particle);
 				}
+			} else {
+				elapsedTime = 0;
+				break;
+			}
 			
 			elapsedTime -= emitionDelay;
 		}

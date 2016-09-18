@@ -33,7 +33,7 @@ public class ParticleInstanceRender implements IRenderableInstance<ParticleRende
 		PARTICLE_MODEL_DATA.loadIndicies(INDICES);
 	}
 	
-	public static final int MAX_PARTICLE_COUNT = 500000;
+	public static final int MAX_PARTICLE_COUNT = 5000;
 	public static final int INSTANCE_DATA_LENGTH = 22;
 	
 	private Shader shader;

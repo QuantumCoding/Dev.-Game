@@ -25,6 +25,7 @@ import com.GameName.RenderEngine.Instancing.Testing.TestInstanceShader;
 import com.GameName.RenderEngine.Particles.Render.ParticleShader;
 import com.GameName.RenderEngine.Shaders.DefaultShader;
 import com.GameName.RenderEngine.Shaders.Shader;
+import com.GameName.RenderEngine.Test.TestShader;
 import com.GameName.World.World;
 import com.GameName.World.Render.WorldShader;
 
@@ -62,11 +63,12 @@ public class ResourceManager implements ICubeRegister, ICommandRegister,
 	}
 	
 	public void registerShaders() {
-		ShaderRegistry.registerShader(Shaders.DefaultShader);
+//		ShaderRegistry.registerShader(Shaders.DefaultShader);
+//		ShaderRegistry.registerShader(Shaders.WorldShader);
+//		ShaderRegistry.registerShader(Shaders.TestInstanceShader);
+
+//		ShaderRegistry.registerShader(Shaders.TestShader);
 		ShaderRegistry.registerShader(Shaders.ParticleShader);
-		ShaderRegistry.registerShader(Shaders.WorldShader);
-		
-		ShaderRegistry.registerShader(Shaders.TestInstanceShader);
 	}
 
 	public static final class Cubes {
@@ -105,6 +107,7 @@ public class ResourceManager implements ICubeRegister, ICommandRegister,
 		public static final Shader WorldShader = new WorldShader();
 		
 		public static final Shader TestInstanceShader = new TestInstanceShader();
+		public static final Shader TestShader = new TestShader();
 	}
 	
 //----------------------------------------------------------------------------------------------------------------------------------\\

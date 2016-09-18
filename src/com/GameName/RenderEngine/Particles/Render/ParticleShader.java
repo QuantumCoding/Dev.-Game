@@ -5,8 +5,8 @@ import org.lwjgl.util.vector.Matrix4f;
 import com.GameName.RenderEngine.Shaders.Shader;
 
 public class ParticleShader extends Shader {
-	private static final String VERTEX_SHADER_LOC = "res/shaders/NonParticleShader.vsh";
-	private static final String FRAGMENT_SHADER_LOC = "res/shaders/NonParticleShader.fsh";
+	private static final String VERTEX_SHADER_LOC = "res/shaders/ParticleShader.vsh";
+	private static final String FRAGMENT_SHADER_LOC = "res/shaders/ParticleShader.fsh";
 
 	public static final int ATTRIBUTE_LOC_OFFSET_1 = 2;
 	public static final int ATTRIBUTE_LOC_OFFSET_2 = 3;

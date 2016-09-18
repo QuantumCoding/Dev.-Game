@@ -20,8 +20,8 @@ public class WorldRenderer extends Renderer<WorldRenderSection, WorldRenderPrope
 	}
 
 	public void renderModels() {
-		for(int i = 0; i < 3; i++)
-			glEnableVertexAttribArray(i);
+		glEnableVertexAttribArray(Shader.ATTRIBUTE_LOC_POSITIONS);
+		glEnableVertexAttribArray(Shader.ATTRIBUTE_LOC_TEXCOORDS);
 		
 		for(WorldRenderSection renderSection : renders.keySet()) {
 //			System.out.println("Rendering Section");
@@ -42,7 +42,7 @@ public class WorldRenderer extends Renderer<WorldRenderSection, WorldRenderPrope
 			
 			for(WorldRenderProperties property : renders.get(renderSection)) {
 				shader.loadTransformationMatrix(property.getTransformMatrix());
-								
+
 				glBindVertexArray(renderSection.getVAOId());
 				glDrawElements(GL_TRIANGLES, renderSection.getIndiceCount(), GL_UNSIGNED_INT, 0);
 			}
@@ -50,8 +50,8 @@ public class WorldRenderer extends Renderer<WorldRenderSection, WorldRenderPrope
 			Shader.unbind();
 		}
 		
-		for(int i = 0; i < 3; i++)
-			glDisableVertexAttribArray(i);
+		glDisableVertexAttribArray(Shader.ATTRIBUTE_LOC_POSITIONS);
+		glDisableVertexAttribArray(Shader.ATTRIBUTE_LOC_TEXCOORDS);
 	}
 
 	public boolean isAcceptedShader(Shader shader) {
