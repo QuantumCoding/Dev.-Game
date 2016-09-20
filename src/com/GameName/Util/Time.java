@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class Time {
-	public static final long SECONDS = 1000000000L;
+	public static final long SECONDS = 1_000_000_000L;
 	
 	public static long getSystemTime() {
 		return System.nanoTime();
