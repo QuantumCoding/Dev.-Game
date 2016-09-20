@@ -7,10 +7,8 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
 
 import com.GameName.Input.TemporaryControlAdder;
-import com.GameName.Particles.ParticleEmitter;
 import com.GameName.Registry.ResourceManager;
 import com.GameName.Registry.ResourceManager.Worlds;
 import com.GameName.Registry.Interfaces.ISetup;
@@ -19,12 +17,8 @@ import com.GameName.Registry.Registries.EntityRegistry;
 import com.GameName.Registry.Registries.ShaderRegistry;
 import com.GameName.Registry.Registries.ThreadRegistry;
 import com.GameName.Registry.Registries.WorldRegistry;
-import com.GameName.RenderEngine.Particles.Particle;
-import com.GameName.RenderEngine.Particles.ParticleManager;
-import com.GameName.RenderEngine.Particles.Texture.ParticleTexture;
 import com.GameName.RenderEngine.Util.Camera;
 import com.GameName.RenderEngine.Window.Window;
-import com.GameName.Util.Vectors.Vector3f;
 
 public class GameName_New implements ISetup {
 	private static final String VERSION = "In-Dev";
@@ -125,30 +119,12 @@ public class GameName_New implements ISetup {
 		
 //		engine.getPlayer().reset();
 
-		ParticleTexture texture = null; // particleStar
-		try { texture = ParticleTexture.getRegistry().registerTexture(4, new File("res/textures/ParticleD.png")); } 
-		catch(IOException e) { e.printStackTrace(); }
-		texture.setAdditvieBlending(true);
-		
-		ParticleTexture.getRegistry().compressTexture();
-		
-		ParticleManager manager = engine.getRender().getParticleManager();
-		ParticleEmitter emitter = new ParticleEmitter(manager, new Vector3f(-5), texture, 0.00005f, false);
-		
 		engine.getPlayer().getCamera().x = -0.5f;
 		engine.getPlayer().getCamera().z = 2;
 		
 		double frameTimeAvg = 0.0; int frameAvgCounter = 0;
 		while(isRunning && !window.isCloseRequested()) {
 			Camera camera = engine.getPlayer().getCamera();
-			
-			if(Keyboard.isKeyDown(Keyboard.KEY_U)) {
-				manager.addParticle(new Particle(new Vector3f(2), (float) (Math.random() * 360), Vector3f.random(1), 
-						Vector3f.random(6).subtract(3, 0, 3), new Vector3f().randomize(2).multiply(-1), 10, texture));
-			}
-			
-			emitter.update((float) window.getFrameTime());
-			manager.update((float) window.getFrameTime(), camera);
 			
 			engine.getInputHandeler().checkControls();
 			engine.getWorld().getChunkLoader().update();
@@ -161,7 +137,7 @@ public class GameName_New implements ISetup {
 			if(frameAvgCounter >= 50) {
 				frameTimeAvg /= (double) frameAvgCounter;
 				window.setTitle(window.getTitle().split(" | ")[0] 
-						+  " | FPS: " + (int)(1.0/frameTimeAvg) + "\t FrameTime: " + (float)frameTimeAvg);
+						+  " | FPS: " + (int)(1.0/frameTimeAvg) + " \t| FrameTime: " + (float)frameTimeAvg);
 				
 				frameTimeAvg = 0.0;
 				frameAvgCounter = 0;
