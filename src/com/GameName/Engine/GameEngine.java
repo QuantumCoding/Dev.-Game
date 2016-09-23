@@ -4,6 +4,7 @@ import com.GameName.Entity.EntityPlayer;
 import com.GameName.Input.TemporaryInputHandler;
 import com.GameName.Input.TemporaryInputHandler.TempAction;
 import com.GameName.Input.TemporaryInputHandler.TempControl;
+import com.GameName.PhysicsEngine.PhysicsEngine;
 import com.GameName.RenderEngine.RenderEngine;
 import com.GameName.RenderEngine.Util.Camera;
 import com.GameName.RenderEngine.Window.Window;
@@ -16,7 +17,7 @@ public class GameEngine {
 //	private GLContextThread glContextThread;
 //	private ThreadGroup threads;
 	
-//	private PhysicsEngine physics;
+	private PhysicsEngine physics;
 	private RenderEngine render;
 //	private SoundEngine sound;
 	
@@ -40,7 +41,7 @@ public class GameEngine {
 		player = new EntityPlayer(new Camera(70, (float) window.getWidth() / (float) window.getHeight(), 0.3f, 1000));
 		inputHandler = new TemporaryInputHandler();
 		
-//		physics = new PhysicsEngine(new AABBCollisionDispacher());
+		physics = new PhysicsEngine();
 		render = new RenderEngine();
 //		sound = new SoundEngine(this);
 		
@@ -63,19 +64,19 @@ public class GameEngine {
 		inputHandler.addControl(key, value, onlyOnce);
 	}
 
-//	public PhysicsEngine getPhysics() {return physics;}	
-	public RenderEngine getRender() {return render;}	
+	public PhysicsEngine getPhysics() { return physics; }	
+	public RenderEngine getRender() { return render; }	
 //	public SoundEngine getSound() {return sound;}
 
 	public TemporaryInputHandler getInputHandeler() { return inputHandler; }
-	public EntityPlayer getPlayer() {return player;}
-	public World getWorld() {return currentWorld;}
+	public EntityPlayer getPlayer() { return player; }
+	public World getWorld() { return currentWorld; }
 	
 //	public Server getServer() {return server;}
 //	public Client getClient() {return client;}
 	
-	public boolean isRunning() {return true;}
-	public GameName_New getGameName() {return gameName;}
+	public boolean isRunning() { return true; }
+	public GameName_New getGameName() { return gameName; }
 	
 	public void cleanUp() {
 //		threads.stopAll();

@@ -3,7 +3,7 @@ package com.GameName.World.Render;
 import org.lwjgl.util.vector.Matrix4f;
 
 import com.GameName.RenderEngine.Shaders.Shader;
-import com.GameName.Util.MathUtil;
+import com.GameName.Util.Math.MathUtil;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class WorldShader extends Shader {

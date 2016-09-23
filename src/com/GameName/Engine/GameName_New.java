@@ -130,6 +130,8 @@ public class GameName_New implements ISetup {
 			engine.getWorld().getChunkLoader().update();
 				
 			engine.getWorld().render(camera);
+			
+			engine.getPhysics().simulate(1.0f);
 			engine.getRender().render(camera);		
 			
 			window.update();
@@ -141,7 +143,7 @@ public class GameName_New implements ISetup {
 				
 				frameTimeAvg = 0.0;
 				frameAvgCounter = 0;
-			} else {
+//			} else {
 				frameTimeAvg += window.getFrameTime();
 				frameAvgCounter ++;
 			}		

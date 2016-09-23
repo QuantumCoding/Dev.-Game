@@ -9,7 +9,7 @@ import org.lwjgl.util.vector.Vector4f;
 import com.GameName.RenderEngine.Util.Camera;
 import com.GameName.RenderEngine.Util.IRenderable;
 import com.GameName.RenderEngine.Util.RenderProperties;
-import com.GameName.RenderEngine.Util.RenderStructs.Plane;
+import com.GameName.Util.Math.Plane;
 import com.GameName.Util.Vectors.MatrixUtil;
 import com.GameName.Util.Vectors.Vector3f;
 

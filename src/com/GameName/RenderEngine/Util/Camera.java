@@ -6,7 +6,7 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import org.lwjgl.opengl.GLContext;
 
 import com.GameName.RenderEngine.Shaders.Shader;
-import com.GameName.RenderEngine.Util.RenderStructs.Plane;
+import com.GameName.Util.Math.Plane;
 import com.GameName.Util.Vectors.MatrixUtil;
 import com.GameName.Util.Vectors.Vector3f;
 

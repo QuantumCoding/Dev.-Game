@@ -26,7 +26,7 @@ public class SBMConverter {
 	
 	public static File convertOBJ(File objFile, File outputFolder, SBMFileFormat format, float renderRadius, float renderDistance, Vector3f center) {
 		if(!objFile.getAbsolutePath().toLowerCase().endsWith(".obj")) 
-			throw new InvalidParameterException("loadOBJ can only load \"*.obj\" files!");
+			throw new InvalidParameterException("convertOBJ can only load \"*.obj\" files!");
 		
 		try {
 			BufferedReader read = new BufferedReader(new FileReader(objFile));

@@ -4,8 +4,8 @@ import java.util.LinkedList;
 
 import com.GameName.Cube.Cube;
 import com.GameName.Registry.ResourceManager.Cubes;
-import com.GameName.Util.MathUtil;
 import com.GameName.Util.Side;
+import com.GameName.Util.Math.MathUtil;
 import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.World;
 import com.GameName.World.Chunk.Chunk;
