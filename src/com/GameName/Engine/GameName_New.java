@@ -143,7 +143,7 @@ public class GameName_New implements ISetup {
 				
 				frameTimeAvg = 0.0;
 				frameAvgCounter = 0;
-//			} else {
+			} else {
 				frameTimeAvg += window.getFrameTime();
 				frameAvgCounter ++;
 			}		

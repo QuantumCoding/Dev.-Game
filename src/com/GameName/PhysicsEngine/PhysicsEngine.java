@@ -5,6 +5,7 @@ import java.util.HashSet;
 import com.GameName.PhysicsEngine.Bodies.MovingBody;
 import com.GameName.PhysicsEngine.Bodies.PhysicsBody;
 import com.GameName.PhysicsEngine.Detection.IntersectionResult;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class PhysicsEngine {
 	private HashSet<PhysicsBody> bodies;
@@ -25,7 +26,10 @@ public class PhysicsEngine {
 	public void simulate(float delta) {
 		for(MovingBody moving : movingBodies) {
 			IntersectionResult intersection = findClosestIntersection(moving);
-			System.out.println(intersection);
+			moving.setIntersectin(intersection != null);
+			
+			moving.setPosition(moving.getPosition().add(moving.getVelocity()));
+			moving.setVelocity(new Vector3f());
 		}
 	}
 

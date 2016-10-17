@@ -1,5 +1,15 @@
 package com.GameName.PhysicsEngine.Bodies;
 
-public class StaticBody extends PhysicsBody {
+import com.GameName.PhysicsEngine.Detection.CollisionMesh;
+import com.GameName.Util.Vectors.Vector3f;
 
+public class StaticBody extends PhysicsBody {
+	public StaticBody(CollisionMesh mesh) {
+		setMesh(mesh);
+	}
+	
+	public void setPosition(Vector3f position) {
+		super.position = position;
+		super.mesh.setPosition(position);
+	}
 }

@@ -1,7 +1,7 @@
 package com.GameName.World.Chunk;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.HashMap;
 
 import com.GameName.Cube.Cube;
 import com.GameName.Engine.GameEngine;
@@ -13,8 +13,8 @@ import com.GameName.World.World;
 public class ChunkLoader {
 	private String fileLoc;
 
-	private HashSet<Chunk> unloadedChunks;
-	private HashSet<Chunk> loadedChunks;
+	private HashMap<Vector3f, Chunk> unloadedChunks;
+	private HashMap<Vector3f, Chunk> loadedChunks;
 
 	private Vector3f center;
 	private int loadRadius;
@@ -28,8 +28,8 @@ public class ChunkLoader {
 		this.world = world;
 		this.loadRadius = loadRadius;
 
-		unloadedChunks = new HashSet<Chunk>();
-		loadedChunks = new HashSet<Chunk>();
+		unloadedChunks = new HashMap<>();
+		loadedChunks = new HashMap<>();
 
 		center = new Vector3f();
 		fileLoc = world.getResourceLocation() + "/chunks/";
@@ -69,13 +69,15 @@ public class ChunkLoader {
 		Vector3f minPos = center.subtract(loadRadius).capMin(0);
 		Vector3f maxPos = center.add(loadRadius).capMax(world.getChunkSizeAsVector()).subtract(1);
 
-		for(Chunk chunk : getLoadedChunks()) {
+		for(Vector3f pos : loadedChunks.keySet()) {
+			Chunk chunk = loadedChunks.get(pos);
+			
 			if(chunk != null && chunk.isLoaded()) {
 				if(chunk.getX() < minPos.getX() || chunk.getY() < minPos.getY()
 						|| chunk.getZ() < minPos.getZ() || chunk.getX() > maxPos.getX()
 						|| chunk.getY() > maxPos.getY() || chunk.getZ() > maxPos.getZ()) {
 
-					unloadedChunks.add(chunk);
+					unloadedChunks.put(chunk.getPos(), chunk);
 					getLoadedChunks().remove(chunk);// .remove(i);
 				}
 			}
@@ -83,7 +85,8 @@ public class ChunkLoader {
 	}
 
 	public void unloadChunks() {
-		for(Chunk chunk : unloadedChunks) {
+		for(Vector3f key : unloadedChunks.keySet()) {
+			Chunk chunk = unloadedChunks.get(key);
 			updateNeighbors(chunk, false);
 			chunk.setIsLoaded(false);
 
@@ -94,7 +97,7 @@ public class ChunkLoader {
 			}
 
 			chunk.cleanUp();
-			unloadedChunks.remove(chunk);
+			unloadedChunks.remove(chunk.getPos());
 
 			chunk = null;
 		}
@@ -254,7 +257,7 @@ public class ChunkLoader {
 				}
 				
 				chunk.setIsLoaded(true);
-				getLoadedChunks().add(chunk); 
+				getLoadedChunks().put(chunk.getPos(), chunk); 
 				updateNeighbors(chunk, true);
 
 				world.getWorldRender().blockAllRebuilds(true);
@@ -394,8 +397,8 @@ public class ChunkLoader {
 	}
 
 	public void saveChunks() {
-		for(Chunk chunk : getLoadedChunks()) {
-			chunk.save(fileLoc);
+		for(Vector3f pos : loadedChunks.keySet()) {
+			loadedChunks.get(pos).save(fileLoc);
 		}
 	}
 
@@ -411,7 +414,8 @@ public class ChunkLoader {
 	}
 
 	public void forceAllChunksUpdate() {
-		for(Chunk chunk : getLoadedChunks()) {
+		for(Vector3f pos : loadedChunks.keySet()) {
+			Chunk chunk = loadedChunks.get(pos);
 			if(chunk != null && chunk.isAccessible()) {
 				chunk.requestRenderRebuild();
 			}
@@ -423,13 +427,7 @@ public class ChunkLoader {
 	}
 
 	public Chunk getChunk(int x, int y, int z) {
-		for(Chunk chunk : getLoadedChunks()) {
-			if(chunk != null && chunk.getPos().equals(x, y, z)) {
-				return chunk;
-			}
-		}
-
-		return null;
+		return loadedChunks.get(new Vector3f(x, y, z));
 	}
 
 	public Vector3f getCenter() {
@@ -449,14 +447,14 @@ public class ChunkLoader {
 	}
 
 	public void cleanUp() {
-		for(Chunk chunk : getLoadedChunks()) {
-			if(chunk != null) {
-				chunk.cleanUp();
+		for(Vector3f chunk : loadedChunks.keySet()) {
+			if(loadedChunks.get(chunk) != null) {
+				loadedChunks.get(chunk).cleanUp();
 			}
 		}
 	}
 
-	public synchronized HashSet<Chunk> getLoadedChunks() {
+	public synchronized HashMap<Vector3f, Chunk> getLoadedChunks() {
 		return loadedChunks;
 	}
 }

@@ -1,8 +1,11 @@
 package com.GameName.PhysicsEngine.Detection;
 
+import com.GameName.PhysicsEngine.MathContext.SpatialContext;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class Triangle {
+	private SpatialContext context;
+	
 	private Vector3f A, B, C; // Points
 	
 	private Vector3f normal;
@@ -14,31 +17,44 @@ public class Triangle {
 		Vector3f AB = B.subtract(A);
 		Vector3f AC = C.subtract(A);
 		
-		normal = AB.crossProduct(AC);
+		normal = AB.crossProduct(AC).normalize();
 		D = -normal.dot(A);
 	}	
 	
-	public Triangle changeSpace(Vector3f divisor) {
-		return new Triangle(A.divide(divisor), B.divide(divisor), C.divide(divisor));
+	public Triangle setContext(SpatialContext context) { 
+		this.context = context; 
+		return this;
 	}
 	
-	public float signedDistance(Vector3f point) {
-		return normal.dot(point) + D;
+	public Triangle changeSpace(SpatialContext convert) {
+		return new Triangle(convert.convert(A, context), convert.convert(B, context), convert.convert(C, context))
+				.setContext(convert);
 	}
-	
-	public boolean containsPoint(Vector3f P) {
-		Vector3f AB = B.subtract(A);
+
+	public float signedDistance(Vector3f point) { return signedDistance(point, null); }
+	public float signedDistance(Vector3f point, SpatialContext convert) {
+		
+		return normal.dot(context.convert(point, convert)) + D;
+	}
+	public boolean containsPoint(Vector3f P) { return containsPoint(P, null); }
+	public boolean containsPoint(Vector3f P, SpatialContext convert) {
+		P = context.convert(P, convert);
+		
 		Vector3f AC = C.subtract(A);
-		Vector3f BC = C.subtract(B);
-		
+		Vector3f AB = B.subtract(A);
 		Vector3f AP = P.subtract(A);
-		Vector3f BP = P.subtract(B);
 		
-		float AB_side = AP.x * AB.y - AP.y * AB.x;
-		float AC_side = AP.x * AC.y - AP.y * AC.x;
-		float BC_side = BP.x * BC.y - BP.y * BC.x;
+		float dotAC_AC = AC.dot(AC);
+		float dotAC_AB = AC.dot(AB);
+		float dotAC_AP = AC.dot(AP);
+		float dotAB_AB = AB.dot(AB);
+		float dotAB_AP = AB.dot(AP);
 		
-		return Math.signum(AB_side) == Math.signum(AC_side) && Math.signum(AB_side) == Math.signum(BC_side);
+		float invDenom = 1 / (dotAC_AC * dotAB_AB - dotAC_AB * dotAC_AB);
+		float u = (dotAB_AB * dotAC_AP - dotAC_AB * dotAB_AP) * invDenom;
+		float v = (dotAC_AC * dotAB_AP - dotAC_AB * dotAC_AP) * invDenom;
+		
+		return u >= 0 && v >= 0 && u + v < 1;
 	}
 
 	public Vector3f getA() { return A; }
@@ -47,6 +63,12 @@ public class Triangle {
 
 	public Vector3f getNormal() { return normal; }
 	public float getD() { return D; }
+	
+	public SpatialContext getContext() { return context; }
+	
+	public String toString() {
+		return normal.toString();
+	}
 
 	public int hashCode() {
 		final int prime = 31;

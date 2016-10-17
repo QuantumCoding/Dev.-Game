@@ -25,7 +25,7 @@ public class World {
 	private String name;
 	private int id, seed;
 	
-	public static final int CHUNK_LOAD_DISTANCE = 5;//2;//5;
+	public static final int CHUNK_LOAD_DISTANCE = 20;//5;//2;//5;
 	private ChunkLoader chunkLoader;
 	private EnvironmentGenerator environmentGen;
 	

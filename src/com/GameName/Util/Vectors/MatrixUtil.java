@@ -46,6 +46,17 @@ public class MatrixUtil {
 		return matrix;
 	}
 	
+	public static Matrix4f initRotationMatrix(Vector3f rotation) {
+		Matrix4f matrix = new Matrix4f();
+		matrix.setIdentity();
+		
+		matrix.rotate((float) Math.toRadians(rotation.x), new org.lwjgl.util.vector.Vector3f(1, 0, 0));
+		matrix.rotate((float) Math.toRadians(rotation.y), new org.lwjgl.util.vector.Vector3f(0, 1, 0));
+		matrix.rotate((float) Math.toRadians(rotation.z), new org.lwjgl.util.vector.Vector3f(0, 0, 1));
+
+		return matrix;
+	}
+	
 	public static Matrix4f initTransformationMatrix(Vector3f translation, Vector3f rotation, Vector3f scale) {
 		Matrix4f matrix = new Matrix4f();
 		matrix.setIdentity();

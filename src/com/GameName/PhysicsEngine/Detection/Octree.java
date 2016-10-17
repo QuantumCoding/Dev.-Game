@@ -6,37 +6,43 @@ import java.util.HashSet;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class Octree<T extends Triangle> {
-	private static final int NODE_LIMIT = 5;
+	private static final int NODE_LIMIT = 10;
 	private static final float MIN_SIZE = 0.2f;
 	
 	private Node<T> root;
 	
 	public Octree(AABB bounds, ArrayList<T> elements) {
 		root = new Node<>(bounds, elements);
+		root.removeParentChildDuplicuts(null);
 	}
 	
-	public HashSet<T> collect(CollisionEllipse ellipse) {
-		return collect(ellipse, root, new HashSet<>());
+	public HashSet<T> collect(CollisionEllipse ellipse, Vector3f treeCenter) {
+		return collect(ellipse, treeCenter, root, new HashSet<>());
 	}
 	
-	private HashSet<T> collect(CollisionEllipse ellipse, Node<T> root, HashSet<T> results) {
-		if(ellipse.intersects(root.bounds)) {
+	private HashSet<T> collect(CollisionEllipse ellipse, Vector3f treeCenter, Node<T> root, HashSet<T> results) {
+		if(ellipse.intersectsOctree(root.bounds, treeCenter)) {
 			results.addAll(root.elements);
+			
+			if(!root.hasSubsets) return results;
 			
 			for(Node<T> child : root.subsets) {
 				if(child == null) continue;
-				collect(ellipse, child, results);
+				collect(ellipse, treeCenter, child, results);
 			}
 		}
 		
 		return results;
 	}
 	
-	private static class Node<T extends Triangle> {
+	public Node<T> getRoot() { return root; }
+	
+	public static class Node<T extends Triangle> {
 		private Node<T>[] subsets;
 		private AABB bounds;
 		
 		private ArrayList<T> elements;
+		private boolean hasSubsets;
 		
 		public Node(AABB bounds, ArrayList<T> elements) {
 			subsets = Node.makeArray(null, null, null, null, null, null, null, null);
@@ -50,23 +56,34 @@ public class Octree<T extends Triangle> {
 		private void subdivide() {
 			if(bounds.getRadius().lessThenOrEqual(MIN_SIZE)) return;
 			if(elements.size() <= NODE_LIMIT) return;
-
+			
 			int index = 0;
-			HashSet<T> toRem = new HashSet<>();
 			for(AABB aabb : Node.subdivide(bounds)) {
 				ArrayList<T> subContained = new ArrayList<>();
 				
 				for(T element : elements) {
 					if(aabb.contains(element)) {
 						subContained.add(element);
-						toRem.add(element);
 					}
 				}
 				
-				subsets[index ++] = new Node<>(aabb, elements);
+				if(subContained.size() != elements.size()) {
+					subsets[index] = new Node<>(aabb, subContained);
+					this.hasSubsets = true;
+				}
+				
+				index ++;
 			}
-			
-			elements.remove(toRem);
+		}
+		
+		private void removeParentChildDuplicuts(Node<T> parent) {
+			if(parent != null)
+				parent.elements.removeAll(elements);
+				
+			for(Node<T> child : subsets) {
+				if(child == null) continue;
+				child.removeParentChildDuplicuts(this);
+			}
 		}
 		
 		private static AABB[] subdivide(AABB bounds) {
@@ -90,5 +107,8 @@ public class Octree<T extends Triangle> {
 		
 		@SafeVarargs
 		private static <T> T[] makeArray(T... array) { return array; }
+	
+		public AABB getBounds() { return bounds; }
+		public Node<T>[] getSubsections() { return subsets; }
 	}
 }
