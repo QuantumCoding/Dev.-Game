@@ -20,9 +20,6 @@ public class DefaultRenderer extends Renderer<Model, DefaultRenderProperties> {
 //	long totalDiff = 0; int count = 0;
 	public void renderModels() {
 		for(Model model : renders.keySet()) {
-			for(int i = 0; i < model.getLargestAttribute()+1; i++)
-				glEnableVertexAttribArray(i);
-				
 			DefaultShader shader = (DefaultShader) model.getShader();
 			shader.bind();
 			
@@ -44,7 +41,14 @@ public class DefaultRenderer extends Renderer<Model, DefaultRenderProperties> {
 						texture.getOffset(property.getTextureAtlasIndex()));
 				
 				glBindVertexArray(model.getVAOId());
+				
+				for(int i = 0; i < model.getLargestAttribute()+1; i++)
+					glEnableVertexAttribArray(i);
+				
 				glDrawElements(GL_TRIANGLES, model.getIndiceCount(), GL_UNSIGNED_INT, 0);
+				
+				for(int i = 0; i < model.getLargestAttribute()+1; i++)
+					glDisableVertexAttribArray(i);
 				
 //				long endTime = Time.getSystemTime();
 //				totalDiff += endTime- startTime;
@@ -56,9 +60,6 @@ public class DefaultRenderer extends Renderer<Model, DefaultRenderProperties> {
 			
 //			TextureGroup.unbind();			
 			Shader.unbind();
-			
-			for(int i = 0; i < model.getLargestAttribute()+1; i++)
-				glDisableVertexAttribArray(i);
 		}
 	}
 
