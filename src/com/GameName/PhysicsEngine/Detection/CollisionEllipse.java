@@ -16,7 +16,7 @@ public class CollisionEllipse extends CollisionBody {
 	}
 
 	public boolean intersects(AABB aabb) {
-		SpatialContext context = new SpatialContext(radius, aabb.getCenter().divide(radius), null);
+		SpatialContext context = new SpatialContext(radius, aabb.getCenter(), null);
 		
 		Vector3f position = context.convert(super.position);
 		Vector3f aabbRadius = context.scale(aabb.getRadius());
@@ -39,9 +39,10 @@ public class CollisionEllipse extends CollisionBody {
 	}
 	
 	public boolean intersectsOctree(AABB aabb, Vector3f treeCenter) {
-		SpatialContext context = new SpatialContext(radius, treeCenter.add(aabb.getCenter()).divide(radius), null);
+//													radius
+		SpatialContext context = new SpatialContext(radius, treeCenter.add(aabb.getCenter().divide(radius)), null);
 		
-		Vector3f position = context.convert(super.position);
+		Vector3f position = context.translate(super.position);
 		Vector3f aabbRadius = context.scale(aabb.getRadius());
 		
 		Vector3f lower = aabbRadius.multiply(-1);
@@ -62,10 +63,11 @@ public class CollisionEllipse extends CollisionBody {
 	}
 	
 	public IntersectionResult intersect(Triangle tri, Vector3f velocity, SpatialContext context) {
-		tri = tri.setContext(context);//.changeSpace(context);
+		tri = tri.scaleSpace(context);//.changeSpace(context);
 		if(tri.getNormal().dot(velocity.normalize()) >= 0) return null; // Back-Side
 		
 		IntersectionPeriod period = findIntersection(tri, velocity, context);
+//		System.out.println(period);
 		if(!period.isValid()) return null; // False
 		period.clamp();
 		

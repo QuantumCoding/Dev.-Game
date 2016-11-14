@@ -26,7 +26,7 @@ public class PhysicsEngine {
 	public void simulate(float delta) {
 		for(MovingBody moving : movingBodies) {
 			IntersectionResult intersection = findClosestIntersection(moving);
-			moving.setIntersectin(intersection != null);
+			moving.setIntersection(intersection);
 			
 			moving.setPosition(moving.getPosition().add(moving.getVelocity()));
 			moving.setVelocity(new Vector3f());

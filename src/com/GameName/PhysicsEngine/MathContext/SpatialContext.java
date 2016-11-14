@@ -7,15 +7,17 @@ public class SpatialContext {
 		public Vector3f convert(Vector3f vector, SpatialContext context) {
 			if(context == null || context == R3) return vector;
 			
+			vector = vector.rotate(context.rotation);
+			
 			float x = vector.getX();
 			float y = vector.getY();
 			float z = vector.getZ();
 			
-			x = (x + context.origin.x) * context.scale.x;
-			y = (y + context.origin.y) * context.scale.y;
-			z = (z + context.origin.z) * context.scale.z;
+			x = x * context.scale.x + context.origin.x;
+			y = y * context.scale.y + context.origin.y;
+			z = z * context.scale.z + context.origin.z;
 			
-			return new Vector3f(x, y, z).invertRotate(context.rotation);
+			return new Vector3f(x, y, z);
 		}
 		
 		public Vector3f scale(Vector3f vector, SpatialContext context) {
@@ -55,11 +57,11 @@ public class SpatialContext {
 		float z = vector.getZ();
 		
 		// Put in Context  Re-Center 
-		x = x / scale.x - origin.x;
-		y = y / scale.y - origin.y;
-		z = z / scale.z - origin.z;
+		x = (x - origin.x) / scale.x;
+		y = (y - origin.y) / scale.y;
+		z = (z - origin.z) / scale.z;
 		
-		return new Vector3f(x, y, z).rotate(rotation);
+		return new Vector3f(x, y, z).invertRotate(rotation);
 	}
 	
 	public Vector3f scale(Vector3f vector) { return scale(vector, null); }
@@ -72,7 +74,7 @@ public class SpatialContext {
 		return vector.divide(scale);
 	}
 	
-	public Vector3f translate(Vector3f vector) { return scale(vector, null); }
+	public Vector3f translate(Vector3f vector) { return translate(vector, null); }
 	public Vector3f translate(Vector3f vector, SpatialContext context) {
 		if(context == this) return vector;
 		

@@ -17,6 +17,10 @@ public class PhysicsShader extends Shader {
 	private int location_transformationMatrix;
 	private int location_projectionMatrix;
 	private int location_viewMatrix;
+
+	private int location_globalTranslation;
+	private int location_globalRotation;
+	private int location_globalScale;
 	
 	public PhysicsShader() {
 		super(VERTEX_SHADER_LOC, FRAGMENT_SHADER_LOC, PhysicsRenderer.class);
@@ -30,6 +34,10 @@ public class PhysicsShader extends Shader {
 		location_transformationMatrix = super.getUniformLocation("transformationMatrix");
 		location_projectionMatrix = super.getUniformLocation("projectionMatrix");
 		location_viewMatrix =  super.getUniformLocation("viewMatrix");
+
+		location_globalTranslation = super.getUniformLocation("globalTranslation");
+		location_globalRotation = super.getUniformLocation("globalRotation");
+		location_globalScale = super.getUniformLocation("globalScale");
 	}
 
 	protected void bindAttributies() {
@@ -52,5 +60,17 @@ public class PhysicsShader extends Shader {
 	
 	public void loadColor(Vector3f color) {
 		super.loadVector3f(location_color, color);
+	}
+	
+	public void loadGlobalTranslation(Vector3f translation) {
+		super.loadVector3f(location_globalTranslation, translation);
+	}
+	
+	public void loadGlobalRotation(Vector3f rotation) {
+		super.loadVector3f(location_globalRotation, rotation);
+	}
+	
+	public void loadGlobalScale(Vector3f scale) {
+		super.loadVector3f(location_globalScale, scale);
 	}
 }

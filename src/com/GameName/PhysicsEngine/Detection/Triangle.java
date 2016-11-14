@@ -26,6 +26,11 @@ public class Triangle {
 		return this;
 	}
 	
+	public Triangle scaleSpace(SpatialContext convert) {
+		return new Triangle(convert.scale(A, context), convert.scale(B, context), convert.scale(C, context))
+				.setContext(convert);
+	}
+	
 	public Triangle changeSpace(SpatialContext convert) {
 		return new Triangle(convert.convert(A, context), convert.convert(B, context), convert.convert(C, context))
 				.setContext(convert);

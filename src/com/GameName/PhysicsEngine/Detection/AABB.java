@@ -27,8 +27,8 @@ public class AABB extends CollisionBody {
 	public boolean containsLine(Vector3f p0, Vector3f p1) { return containsLine(p0, p1, null); }
 	public boolean containsLine(Vector3f p0, Vector3f p1, SpatialContext pointContext) {
 		
-		return context.convert(p0, pointContext).lessThenOrEqual(radius) && 
-			   context.convert(p1, pointContext).greaterThenOrEqual(radius.multiply(-1));
+		return context.convert(p0, pointContext).lessThenOrEqual(1) && 
+			   context.convert(p1, pointContext).greaterThenOrEqual(-1);
 	}
 	
 	public boolean contains(Triangle tri) {
@@ -40,12 +40,12 @@ public class AABB extends CollisionBody {
 			 containsLine(A, B, context) || containsLine(A, C, context) || containsLine(C, B, context);
 	}
 	
-	public void translate(Vector3f amount) { position = position.add(amount.divide(radius)); }
-	public void moveTo(Vector3f position) { super.position = position.divide(radius); }
+	public void translate(Vector3f amount) { position.set(position.add(amount.divide(radius))); }
+	public void moveTo(Vector3f position) { super.position.set(position); }
 	public void setPosition(Vector3f position) { this.moveTo(position); }
 	
-	public Vector3f getCenter() { return position.multiply(radius); }
-	public Vector3f getPostion() { return getCenter(); }
+	public Vector3f getCenter() { return position; }
+	public Vector3f getPosition() { return getCenter(); }
 	public Vector3f getRadius() { return radius; }
 	
 	public void setSpatialContext(SpatialContext context) { this.context = context; }

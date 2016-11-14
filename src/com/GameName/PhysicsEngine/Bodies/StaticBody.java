@@ -12,4 +12,9 @@ public class StaticBody extends PhysicsBody {
 		super.position = position;
 		super.mesh.setPosition(position);
 	}
+	
+	public void setRotation(Vector3f rotation) {
+		super.rotation = rotation;
+		super.mesh.setRotation(rotation);
+	}
 }

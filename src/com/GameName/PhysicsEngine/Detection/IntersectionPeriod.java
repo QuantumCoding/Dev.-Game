@@ -51,6 +51,10 @@ public class IntersectionPeriod implements Comparable<IntersectionPeriod> {
 		
 		return true;
 	}
+	
+	public String toString() {
+		return "IntersectionPeriod [" + t0 + ", " + t1 + "]";
+	}
 
 	public int compareTo(IntersectionPeriod o) {
 		return Float.compare(t0, o.t0);
