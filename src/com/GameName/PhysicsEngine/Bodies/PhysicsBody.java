@@ -1,6 +1,6 @@
 package com.GameName.PhysicsEngine.Bodies;
 
-import com.GameName.PhysicsEngine.Detection.CollisionMesh;
+import com.GameName.PhysicsEngine.Detection.Colliders.CollisionMesh;
 import com.GameName.Util.Vectors.Vector3f;
 
 public abstract class PhysicsBody {

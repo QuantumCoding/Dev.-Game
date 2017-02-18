@@ -1,4 +1,4 @@
-package com.GameName.PhysicsEngine.Detection;
+package com.GameName.PhysicsEngine.Detection.Colliders;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
+import com.GameName.PhysicsEngine.Detection.Triangle;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class CollisionMeshLoader {

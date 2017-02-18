@@ -3,6 +3,8 @@ package com.GameName.PhysicsEngine.Detection;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import com.GameName.PhysicsEngine.Detection.Colliders.AABB;
+import com.GameName.PhysicsEngine.Detection.Colliders.CollisionSphere;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class Octree<T extends Triangle> {
@@ -16,19 +18,19 @@ public class Octree<T extends Triangle> {
 		root.removeParentChildDuplicuts(null);
 	}
 	
-	public HashSet<T> collect(CollisionEllipse ellipse, Vector3f treeCenter) {
-		return collect(ellipse, treeCenter, root, new HashSet<>());
+	public HashSet<T> collect(CollisionSphere sphere, Vector3f treeCenter) {
+		return collect(sphere, treeCenter, root, new HashSet<>());
 	}
 	
-	private HashSet<T> collect(CollisionEllipse ellipse, Vector3f treeCenter, Node<T> root, HashSet<T> results) {
-		if(ellipse.intersectsOctree(root.bounds, treeCenter)) {
+	private HashSet<T> collect(CollisionSphere sphere, Vector3f treeCenter, Node<T> root, HashSet<T> results) {
+		if(sphere.intersectsOctree(root.bounds, treeCenter)) {
 			results.addAll(root.elements);
 			
 			if(!root.hasSubsets) return results;
 			
 			for(Node<T> child : root.subsets) {
 				if(child == null) continue;
-				collect(ellipse, treeCenter, child, results);
+				collect(sphere, treeCenter, child, results);
 			}
 		}
 		

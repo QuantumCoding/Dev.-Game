@@ -3,8 +3,8 @@ package com.GameName.PhysicsEngine.Render.Octree;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.GameName.PhysicsEngine.Detection.AABB;
 import com.GameName.PhysicsEngine.Detection.Octree;
+import com.GameName.PhysicsEngine.Detection.Colliders.AABB;
 import com.GameName.PhysicsEngine.Detection.Octree.Node;
 import com.GameName.RenderEngine.Models.Model;
 import com.GameName.RenderEngine.Models.ModelData.ModelData;

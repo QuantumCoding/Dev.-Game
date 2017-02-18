@@ -4,7 +4,7 @@ import java.util.HashSet;
 
 import com.GameName.PhysicsEngine.Bodies.MovingBody;
 import com.GameName.PhysicsEngine.Bodies.PhysicsBody;
-import com.GameName.PhysicsEngine.Detection.IntersectionResult;
+import com.GameName.PhysicsEngine.Detection.Intersection.IntersectionResult;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class PhysicsEngine {

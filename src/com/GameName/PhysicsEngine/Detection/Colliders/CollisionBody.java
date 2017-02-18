@@ -1,4 +1,4 @@
-package com.GameName.PhysicsEngine.Detection;
+package com.GameName.PhysicsEngine.Detection.Colliders;
 
 import com.GameName.Util.Vectors.Vector3f;
 

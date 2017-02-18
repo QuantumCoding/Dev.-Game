@@ -1,11 +1,10 @@
 package com.GameName.PhysicsEngine.Detection;
 
-import com.GameName.PhysicsEngine.MathContext.SpatialContext;
+import org.lwjgl.util.vector.Matrix4f;
+
 import com.GameName.Util.Vectors.Vector3f;
 
 public class Triangle {
-	private SpatialContext context;
-	
 	private Vector3f A, B, C; // Points
 	
 	private Vector3f normal;
@@ -21,30 +20,27 @@ public class Triangle {
 		D = -normal.dot(A);
 	}	
 	
-	public Triangle setContext(SpatialContext context) { 
-		this.context = context; 
-		return this;
-	}
-	
-	public Triangle scaleSpace(SpatialContext convert) {
-		return new Triangle(convert.scale(A, context), convert.scale(B, context), convert.scale(C, context))
-				.setContext(convert);
-	}
-	
-	public Triangle changeSpace(SpatialContext convert) {
-		return new Triangle(convert.convert(A, context), convert.convert(B, context), convert.convert(C, context))
-				.setContext(convert);
+	public Triangle changeSpace(Matrix4f transform, Vector3f preRotation) {
+		Vector3f a = A.clone(), b = B.clone(), c = C.clone();
+		
+		if(preRotation != null) {
+			a = a.rotate(preRotation);
+			b = b.rotate(preRotation);
+			c = c.rotate(preRotation);
+		}
+		
+		a = a.transform(transform);
+		b = b.transform(transform);
+		c = c.transform(transform);
+		
+		return new Triangle(a, b, c);
 	}
 
-	public float signedDistance(Vector3f point) { return signedDistance(point, null); }
-	public float signedDistance(Vector3f point, SpatialContext convert) {
-		
-		return normal.dot(context.convert(point, convert)) + D;
+	public float signedDistance(Vector3f point) {
+		return normal.dot(point) + D;
 	}
-	public boolean containsPoint(Vector3f P) { return containsPoint(P, null); }
-	public boolean containsPoint(Vector3f P, SpatialContext convert) {
-		P = context.convert(P, convert);
-		
+	
+	public boolean containsPoint(Vector3f P) {
 		Vector3f AC = C.subtract(A);
 		Vector3f AB = B.subtract(A);
 		Vector3f AP = P.subtract(A);
@@ -68,8 +64,6 @@ public class Triangle {
 
 	public Vector3f getNormal() { return normal; }
 	public float getD() { return D; }
-	
-	public SpatialContext getContext() { return context; }
 	
 	public String toString() {
 		return normal.toString();

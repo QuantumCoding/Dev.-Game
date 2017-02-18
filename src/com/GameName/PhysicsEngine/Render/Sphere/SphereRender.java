@@ -3,7 +3,7 @@ package com.GameName.PhysicsEngine.Render.Sphere;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.GameName.PhysicsEngine.Detection.CollisionEllipse;
+import com.GameName.PhysicsEngine.Detection.Colliders.CollisionEllipse;
 import com.GameName.RenderEngine.Models.Model;
 import com.GameName.RenderEngine.Models.ModelData.ModelData;
 import com.GameName.RenderEngine.Shaders.Shader;

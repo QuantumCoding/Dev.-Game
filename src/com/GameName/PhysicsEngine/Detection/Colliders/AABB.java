@@ -1,5 +1,6 @@
-package com.GameName.PhysicsEngine.Detection;
+package com.GameName.PhysicsEngine.Detection.Colliders;
 
+import com.GameName.PhysicsEngine.Detection.Triangle;
 import com.GameName.PhysicsEngine.MathContext.SpatialContext;
 import com.GameName.Util.Vectors.Vector3f;
 
@@ -32,9 +33,9 @@ public class AABB extends CollisionBody {
 	}
 	
 	public boolean contains(Triangle tri) {
-		Vector3f A = context.convert(tri.getA(), tri.getContext());
-		Vector3f B = context.convert(tri.getB(), tri.getContext());
-		Vector3f C = context.convert(tri.getC(), tri.getContext());
+		Vector3f A = context.convert(tri.getA());
+		Vector3f B = context.convert(tri.getB());
+		Vector3f C = context.convert(tri.getC());
 		
 		return containsPoint(A, context) || containsPoint(B, context)   || containsPoint(C, context) ||
 			 containsLine(A, B, context) || containsLine(A, C, context) || containsLine(C, B, context);

@@ -1,4 +1,4 @@
-package com.GameName.PhysicsEngine.Detection;
+package com.GameName.PhysicsEngine.Detection.Intersection;
 
 public class IntersectionPeriod implements Comparable<IntersectionPeriod> {
 	public static final IntersectionPeriod NO_INTERSECTION = new IntersectionPeriod(2, -2);
@@ -21,6 +21,10 @@ public class IntersectionPeriod implements Comparable<IntersectionPeriod> {
 		return !(Float.isNaN(t0) || Float.isNaN(t1)) &&
 			   !(Float.isInfinite(t0) || Float.isInfinite(t1)) &&
 			   !(t0 > 1 || t1 < 0);
+	}
+	
+	public boolean isLowerValid() {
+		return !Float.isNaN(t0) && !Float.isInfinite(t0) && !(t0 > 1);
 	}
 	
 	public void clamp() {

@@ -2,16 +2,17 @@ package com.GameName.PhysicsEngine.Bodies;
 
 import java.util.HashSet;
 
-import com.GameName.PhysicsEngine.Detection.CollisionEllipse;
-import com.GameName.PhysicsEngine.Detection.CollisionMesh;
-import com.GameName.PhysicsEngine.Detection.IntersectionResult;
 import com.GameName.PhysicsEngine.Detection.Triangle;
-import com.GameName.PhysicsEngine.MathContext.SpatialContext;
+import com.GameName.PhysicsEngine.Detection.Colliders.CollisionEllipse;
+import com.GameName.PhysicsEngine.Detection.Colliders.CollisionMesh;
+import com.GameName.PhysicsEngine.Detection.Colliders.CollisionSphere;
+import com.GameName.PhysicsEngine.Detection.Intersection.IntersectionResult;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class MovingBody extends PhysicsBody {
 	private Vector3f velocity;
-	private CollisionEllipse body; 
+	private CollisionEllipse body;
+	private CollisionSphere broadPhaseSphere; 
 	
 	private IntersectionResult intersection;
 	
@@ -22,6 +23,8 @@ public class MovingBody extends PhysicsBody {
 	public MovingBody(CollisionEllipse body) {
 		velocity = new Vector3f();
 		this.body = body;
+		
+		broadPhaseSphere = new CollisionSphere(body.getRadius().max());
 	}
 	
 	public void setPosition(Vector3f position) {
@@ -41,41 +44,34 @@ public class MovingBody extends PhysicsBody {
 	public IntersectionResult intersect(CollisionMesh mesh) {
 		IntersectionResult result = null;
 		
-		Vector3f meshPos_Save = mesh.getPosition().clone();
-
-		Vector3f bodyPos = body.getPosition();
-		Vector3f meshPos = mesh.getPosition();
+		broadPhaseSphere.setPosition(position.subtract(mesh.getPosition()).invertRotate(mesh.getRotation()).add(mesh.getPosition()));
+		HashSet<Triangle> possibleCollisions = mesh.collect(broadPhaseSphere);
+		Vector3f transVelocity = mesh.getPosition().subtract(body.getPosition()).normalize().divide(1000); //new Vector3f(-0.001, 0, 0);//.scale(velocity);
 		
-		SpatialContext sc1 = new SpatialContext(body.getRadius(), position, null); // RE-CENTER
-		bodyPos = sc1.convert(bodyPos);
-		meshPos = sc1.convert(meshPos);
-//															   mesh.getRotation().subtract(rotation)
-		SpatialContext sc4 = new SpatialContext(null, meshPos, mesh.getRotation()); // RE-CENTER
-		bodyPos = sc4.convert(bodyPos);
-		meshPos = sc4.convert(meshPos);
-		
-		body.setPosition(bodyPos);//ellipsoidSpace_meshOrigin.convert(position));
-		mesh.setPosition(meshPos);
-		
-		HashSet<Triangle> possibleCollisions = mesh.collect(body);
-		
-		SpatialContext ellipsoidSpace_meshOrigin = new SpatialContext(body.getRadius(), meshPos, null);
-				//new SpatialContext(body.getRadius(), meshPos, null);
-		Vector3f transVelocity = meshPos.subtract(bodyPos).normalize().divide(100); //new Vector3f(-0.001, 0, 0);//.scale(velocity);
+		body.setPosition(mesh.getPosition().subtract(position).transform(body.getInverseTransform()).multiply(-1));
 		
 		for(Triangle tri : possibleCollisions) {
-			IntersectionResult intersection = body.intersect(tri, transVelocity, ellipsoidSpace_meshOrigin);
+			IntersectionResult intersection = body.intersect(tri, transVelocity, mesh.getRotation()); // ellipsoidSpace_meshOrigin
 			if(intersection == null) continue;
+			body.intersect(tri, transVelocity, mesh.getRotation()); // ellipsoidSpace_meshOrigin
 			
 			if(result == null || intersection.getDistance() < result.getDistance())
 				result = intersection;
 		}
 		
-		body.setPosition(position);
-		mesh.setPosition(meshPos_Save);
+//		AABB bounds = mesh.getOctree().getRoot().getBounds();
+//		OBB collider = new OBB(bounds, mesh.getRotation());
+//		collider.setPosition(mesh.getPosition());
+//		
+//		if(collider.interseting(body)) {
+//			result = new IntersectionResult(new Vector3f(), 0);
+//		}
 		
 		return result;
 	}
+	
+	public CollisionEllipse getBody() { return body; }
+	public CollisionSphere getBroad() { return broadPhaseSphere; }
 	
 	public IntersectionResult getIntersection() { return intersection; }
 	public void setIntersection(IntersectionResult intersection) { this.intersection = intersection; }

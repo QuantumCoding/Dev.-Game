@@ -1,73 +1,51 @@
-package com.GameName.PhysicsEngine.Detection;
+package com.GameName.PhysicsEngine.Detection.Colliders;
 
 import java.util.Arrays;
 
-import com.GameName.PhysicsEngine.MathContext.SpatialContext;
+import org.lwjgl.util.vector.Matrix4f;
+
+import com.GameName.PhysicsEngine.Detection.Triangle;
+import com.GameName.PhysicsEngine.Detection.Intersection.IntersectionPeriod;
+import com.GameName.PhysicsEngine.Detection.Intersection.IntersectionResult;
+import com.GameName.RenderEngine.Util.RenderStructs.Transform;
 import com.GameName.Util.Math.MathUtil;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class CollisionEllipse extends CollisionBody {
 	private Vector3f radius;
-	private SpatialContext context;
+	
+	private Transform transform;
+	private Matrix4f inverserTransfrom;
 	
 	public CollisionEllipse(Vector3f radius) {
 		this.radius = radius;
-		context = new SpatialContext(radius, null, null);
-	}
-
-	public boolean intersects(AABB aabb) {
-		SpatialContext context = new SpatialContext(radius, aabb.getCenter(), null);
 		
-		Vector3f position = context.convert(super.position);
-		Vector3f aabbRadius = context.scale(aabb.getRadius());
-		
-		Vector3f lower = aabbRadius.multiply(-1);
-		Vector3f upper = aabbRadius;
-		
-		float dist_squared = 1;
-		
-		if(position.x < lower.x) dist_squared -= Math.pow(position.x - lower.x, 2);
-		else if(position.x > upper.x) dist_squared -= Math.pow(position.x - upper.x, 2);
-		
-		if(position.y < lower.y) dist_squared -= Math.pow(position.y - lower.y, 2);
-		else if(position.y > upper.y) dist_squared -= Math.pow(position.y - upper.y, 2);
-		
-		if(position.z < lower.z) dist_squared -= Math.pow(position.z - lower.z, 2);
-		else if(position.z > upper.z) dist_squared -= Math.pow(position.z - upper.z, 2);
-		
-		return dist_squared > 0;
+		transform = new Transform();
+		updateTransform();
 	}
 	
-	public boolean intersectsOctree(AABB aabb, Vector3f treeCenter) {
-//													radius
-		SpatialContext context = new SpatialContext(radius, treeCenter.add(aabb.getCenter().divide(radius)), null);
-		
-		Vector3f position = context.translate(super.position);
-		Vector3f aabbRadius = context.scale(aabb.getRadius());
-		
-		Vector3f lower = aabbRadius.multiply(-1);
-		Vector3f upper = aabbRadius;
-		
-		float dist_squared = 1;
-		
-		if(position.x < lower.x) dist_squared -= Math.pow(position.x - lower.x, 2);
-		else if(position.x > upper.x) dist_squared -= Math.pow(position.x - upper.x, 2);
-		
-		if(position.y < lower.y) dist_squared -= Math.pow(position.y - lower.y, 2);
-		else if(position.y > upper.y) dist_squared -= Math.pow(position.y - upper.y, 2);
-		
-		if(position.z < lower.z) dist_squared -= Math.pow(position.z - lower.z, 2);
-		else if(position.z > upper.z) dist_squared -= Math.pow(position.z - upper.z, 2);
-		
-		return dist_squared > 0;
+	private void updateTransform() {
+		transform.setScale(radius);
+		transform.setRotation(super.rotation);
+	
+		inverserTransfrom = (Matrix4f) transform.getTransformMatrix().invert();
 	}
 	
-	public IntersectionResult intersect(Triangle tri, Vector3f velocity, SpatialContext context) {
-		tri = tri.scaleSpace(context);//.changeSpace(context);
+	public void setRotation(Vector3f rotation) {
+		super.setRotation(rotation);
+		updateTransform();
+	}
+	
+	public void setRadius(Vector3f radius) {
+		this.radius = radius;
+		updateTransform();
+	}
+	
+	public IntersectionResult intersect(Triangle tri, Vector3f velocity, Vector3f meshRotation) {
+		tri = tri.changeSpace(inverserTransfrom, meshRotation);
 		if(tri.getNormal().dot(velocity.normalize()) >= 0) return null; // Back-Side
 		
-		IntersectionPeriod period = findIntersection(tri, velocity, context);
-//		System.out.println(period);
+		IntersectionPeriod period = findIntersection(tri, velocity);
 		if(!period.isValid()) return null; // False
 		period.clamp();
 		
@@ -75,7 +53,7 @@ public class CollisionEllipse extends CollisionBody {
 		Vector3f intersectionPoint = null;
 		
 		intersectionPoint = position.subtract(tri.getNormal()).add(velocity.multiply(period.t0()));
-		boolean inTriangle = tri.containsPoint(intersectionPoint, context);
+		boolean inTriangle = tri.containsPoint(intersectionPoint);
 		if(inTriangle) intersectionDistance = period.t0() * velocity.length(); // True, In Triangle
 		
 		if(!inTriangle) {
@@ -116,7 +94,7 @@ public class CollisionEllipse extends CollisionBody {
 		Arrays.sort(intersections);
 		for(Intersection intersection : intersections) {
 			if(intersection == null) continue;
-			if(!intersection.period.isValid()) continue;
+			if(!intersection.period.isLowerValid()) continue;
 			if(intersection == loc) break;
 			
 			LineIntersection lineItersect = (LineIntersection) intersection;
@@ -136,8 +114,7 @@ public class CollisionEllipse extends CollisionBody {
 		
 		Arrays.sort(intersections);
 		for(IntersectionLocation intersection : intersections) {
-			if(!intersection.period.isValid()) continue;
-			
+			if(!intersection.period.isLowerValid()) continue;
 			return intersection;
 		}
 		
@@ -151,8 +128,8 @@ public class CollisionEllipse extends CollisionBody {
 		float b = 2 * velocity.dot(position.subtract(point));
 		float c = point.subtract(position).lengthSquared() - 1;
 		
-		float[] results = MathUtil.quadicFormula(a, b, c);
-		return new IntersectionLocation(Math.min(results[0], results[1]), Math.max(results[0], results[1]), point);
+		float[] results = sortedQuadradicFormula(a, b, c);
+		return new IntersectionLocation(results[0], results[1], point);
 	}
 	
 	private LineIntersection findIntersection(Vector3f p1, Vector3f p2, Vector3f velocity) {
@@ -160,24 +137,45 @@ public class CollisionEllipse extends CollisionBody {
 		Vector3f direction = p1.subtract(position);
 		
 		float a = edge.lengthSquared() * -velocity.lengthSquared() + (float) Math.pow(edge.dot(velocity), 2);
-		float b = edge.lengthSquared() * (2 * velocity.dot(direction)) - 2 * edge.dot(velocity) * edge.dot(direction);
+		float b = edge.lengthSquared() * (2 * velocity.dot(direction)) - (2 * (edge.dot(velocity) * edge.dot(direction)));
 		float c = edge.lengthSquared() * (1 - direction.lengthSquared()) + (float) Math.pow(edge.dot(direction), 2);
 		
-		float[] results = MathUtil.quadicFormula(a, b, c);
-		return new LineIntersection(Math.min(results[0], results[1]), Math.max(results[0], results[1]), p1, p2);
+		float[] results = sortedQuadradicFormula(a, b, c);
+		return new LineIntersection(results[0], results[1], p1, p2);
 	}
 	
-	private IntersectionPeriod findIntersection(Triangle tri, Vector3f velocity, SpatialContext context) {
+	private float[] sortedQuadradicFormula(float a, float b, float c) {
+		float[] results = MathUtil.quadicFormula(a, b, c);
+		
+		float min = results[0];
+		float max = results[1];
+		
+		if(!Float.isNaN(min)) {
+			if(min > max) {
+				float temp = min;
+				min = max; max = temp;
+			}
+			
+			if(min < 0) min = max;
+			if(min < 0) min = max = Float.NaN;
+		}
+		
+		return new float[] { min, max };
+	}
+	
+	private IntersectionPeriod findIntersection(Triangle tri, Vector3f velocity) {
 		float t0 = 0, t1 = 1;
 		
-		if(Math.abs(velocity.dot(tri.getNormal())) < 0.00001f) {
-			if(Math.abs(tri.signedDistance(position, context)) > 1)
+		float velDotNorm = velocity.dot(tri.getNormal());
+		float distance = tri.signedDistance(position);
+		
+		if(Math.abs(velDotNorm) < 0.00001f) {
+			if(Math.abs(distance) > 1)
 				return IntersectionPeriod.NO_INTERSECTION;
 			
 		} else {
-			float velDotNorm = velocity.dot(tri.getNormal());
-			t0 = ( 1 - tri.signedDistance(position, context)) / velDotNorm;
-			t1 = (-1 - tri.signedDistance(position, context)) / velDotNorm;
+			t0 = ( 1 - distance) / velDotNorm;
+			t1 = (-1 - distance) / velDotNorm;
 			
 			if(t0 > t1) {
 				float temp = t0;
@@ -191,11 +189,8 @@ public class CollisionEllipse extends CollisionBody {
 //	-------------------------------------------------------------------------------------------------------- \\
 	
 	public Vector3f getRadius() { return radius; }
-	
 	public CollisionEllipse shift(Vector3f shift) { position = position.subtract(shift); return this; }
-	public void setPosition(Vector3f position) { super.position = position; }
-	
-	public SpatialContext getSpatialContext() { return context; }
+	public Matrix4f getInverseTransform() { return inverserTransfrom; }
 	
 //	-------------------------------------------------------------------------------------------------------- \\
 	
