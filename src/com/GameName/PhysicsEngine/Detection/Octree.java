@@ -18,19 +18,38 @@ public class Octree<T extends Triangle> {
 		root.removeParentChildDuplicuts(null);
 	}
 	
-	public HashSet<T> collect(CollisionSphere sphere, Vector3f treeCenter) {
-		return collect(sphere, treeCenter, root, new HashSet<>());
+	public HashSet<T> collect(CollisionSphere sphere, Vector3f treeCenter, Vector3f velocity) {
+		return collect(sphere, treeCenter, velocity, root, new HashSet<>());
 	}
 	
-	private HashSet<T> collect(CollisionSphere sphere, Vector3f treeCenter, Node<T> root, HashSet<T> results) {
-		if(sphere.intersectsOctree(root.bounds, treeCenter)) {
+	private HashSet<T> collect(CollisionSphere sphere, Vector3f treeCenter, Vector3f velocity, Node<T> root, HashSet<T> results) {
+		if(sphere.intersectsOctree(root.bounds, treeCenter, velocity)) {
 			results.addAll(root.elements);
+
+			if(!root.hasSubsets) return results;
+			
+			for(Node<T> child : root.subsets) {
+				if(child == null) continue;
+				collect(sphere, treeCenter, velocity, child, results);
+			}
+		}
+		
+		return results;
+	}
+	
+	public HashSet<AABB> collect(CollisionSphere sphere, Vector3f treeCenter, Vector3f velocity, boolean b) {
+		return collect2(sphere, treeCenter, velocity, root, new HashSet<>());
+	}
+	
+	private HashSet<AABB> collect2(CollisionSphere sphere, Vector3f treeCenter, Vector3f velocity, Node<T> root, HashSet<AABB> results) {
+		if(sphere.intersectsOctree(root.bounds, treeCenter, velocity)) {
+			if(!root.hasSubsets) results.add(root.bounds);
 			
 			if(!root.hasSubsets) return results;
 			
 			for(Node<T> child : root.subsets) {
 				if(child == null) continue;
-				collect(sphere, treeCenter, child, results);
+				collect2(sphere, treeCenter, velocity, child, results);
 			}
 		}
 		

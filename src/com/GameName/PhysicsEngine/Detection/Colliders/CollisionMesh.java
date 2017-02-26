@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 import com.GameName.PhysicsEngine.Detection.Octree;
 import com.GameName.PhysicsEngine.Detection.Triangle;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class CollisionMesh extends CollisionBody {
 	private Octree<Triangle> octree;
@@ -13,8 +14,8 @@ public class CollisionMesh extends CollisionBody {
 		octree = new Octree<>(bounds, faces);
 	}
 
-	public HashSet<Triangle> collect(CollisionSphere sphere) { 
-		return octree.collect(sphere, super.position);
+	public HashSet<Triangle> collect(CollisionSphere sphere, Vector3f velocity) { 
+		return octree.collect(sphere, super.position, velocity);
 	}
 
 	public Octree<Triangle> getOctree() { return octree; }

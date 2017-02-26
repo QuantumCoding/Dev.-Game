@@ -98,7 +98,7 @@ public class MatrixUtil {
 	}
 	
 	public static Matrix4f lookAt(Vector3f eye, Vector3f center, Vector3f up) {
-		return lookAt(eye, center, up, false);}
+		return lookAt(eye, center, up, false); }
 	public static Matrix4f lookAt(Vector3f eye, Vector3f center, Vector3f up, boolean leftHanded) {
 		Matrix4f result = (Matrix4f) new Matrix4f().setIdentity();
 		Vector3f f = center.subtract(eye).normalize();

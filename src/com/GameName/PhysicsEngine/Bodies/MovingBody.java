@@ -2,6 +2,8 @@ package com.GameName.PhysicsEngine.Bodies;
 
 import java.util.HashSet;
 
+import org.lwjgl.util.vector.Matrix4f;
+
 import com.GameName.PhysicsEngine.Detection.Triangle;
 import com.GameName.PhysicsEngine.Detection.Colliders.CollisionEllipse;
 import com.GameName.PhysicsEngine.Detection.Colliders.CollisionMesh;
@@ -44,9 +46,13 @@ public class MovingBody extends PhysicsBody {
 	public IntersectionResult intersect(CollisionMesh mesh) {
 		IntersectionResult result = null;
 		
+		if(mesh == null) return null;
 		broadPhaseSphere.setPosition(position.subtract(mesh.getPosition()).invertRotate(mesh.getRotation()).add(mesh.getPosition()));
-		HashSet<Triangle> possibleCollisions = mesh.collect(broadPhaseSphere);
-		Vector3f transVelocity = mesh.getPosition().subtract(body.getPosition()).normalize().divide(1000); //new Vector3f(-0.001, 0, 0);//.scale(velocity);
+		Vector3f meshSpaceVeclocity = velocity.invertRotate(mesh.getRotation());
+		
+		HashSet<Triangle> possibleCollisions = mesh.collect(broadPhaseSphere, meshSpaceVeclocity);
+		Vector3f transVelocity = velocity.transform(body.getInverseTransform());
+		//mesh.getPosition().subtract(body.getPosition()).normalize().divide(1000); //new Vector3f(-0.001, 0, 0);//.scale(velocity);
 		
 		body.setPosition(mesh.getPosition().subtract(position).transform(body.getInverseTransform()).multiply(-1));
 		
@@ -55,16 +61,17 @@ public class MovingBody extends PhysicsBody {
 			if(intersection == null) continue;
 			body.intersect(tri, transVelocity, mesh.getRotation()); // ellipsoidSpace_meshOrigin
 			
-			if(result == null || intersection.getDistance() < result.getDistance())
-				result = intersection;
+			if(result == null || intersection.getDistance() < result.getDistance()) {
+//				result = intersection;
+				
+				Vector3f point = intersection.getPoint().transform(Matrix4f.invert(body.getInverseTransform(), null));
+				point = point.add(mesh.getPosition());
+				result = new IntersectionResult(point, intersection.getDistance());
+			}
 		}
 		
-//		AABB bounds = mesh.getOctree().getRoot().getBounds();
-//		OBB collider = new OBB(bounds, mesh.getRotation());
-//		collider.setPosition(mesh.getPosition());
-//		
-//		if(collider.interseting(body)) {
-//			result = new IntersectionResult(new Vector3f(), 0);
+//		if(possibleCollisions.size() > 0) {
+//			result = new IntersectionResult(mesh.getPosition(), 0);
 //		}
 		
 		return result;

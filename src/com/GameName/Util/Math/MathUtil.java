@@ -16,6 +16,14 @@ public class MathUtil {
 				min = i;
 		return min;
 	}
+	
+	public static float min(float... nums) {
+		float min = Float.MAX_VALUE;
+		for(float i : nums)
+			if(i < min)
+				min = i;
+		return min;
+	}
 		
 	public static float fastInvserseSqrt(float value) {
 		int bits = Float.floatToIntBits(value);

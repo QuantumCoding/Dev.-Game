@@ -23,12 +23,19 @@ public class PhysicsEngine {
 			movingBodies.add((MovingBody) body);
 	}
 	
+	public void remove(PhysicsBody body) {
+		if(!bodies.remove(body)) return;
+		
+		if(body instanceof MovingBody)
+			movingBodies.remove((MovingBody) body);
+	}
+	
 	public void simulate(float delta) {
 		for(MovingBody moving : movingBodies) {
 			IntersectionResult intersection = findClosestIntersection(moving);
 			moving.setIntersection(intersection);
 			
-			moving.setPosition(moving.getPosition().add(moving.getVelocity()));
+			moving.setPosition(moving.getPosition().add(moving.getVelocity().multiply(delta)));
 			moving.setVelocity(new Vector3f());
 		}
 	}
@@ -38,6 +45,7 @@ public class PhysicsEngine {
 		
 		for(PhysicsBody body : bodies) {
 			if(body == moving) continue;
+			if(body.getMesh() == null) continue;
 			
 			IntersectionResult intersection = moving.intersect(body.getMesh());
 			if(intersection == null) continue;
