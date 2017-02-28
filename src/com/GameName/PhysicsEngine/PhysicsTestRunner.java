@@ -7,7 +7,7 @@ import java.util.ListIterator;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.opengl.Display;
 
 import com.GameName.PhysicsEngine.Bodies.MovingBody;
 import com.GameName.PhysicsEngine.Bodies.Raycast;
@@ -28,10 +28,7 @@ import com.GameName.PhysicsEngine.Render.Sphere.SphereRender;
 import com.GameName.RenderEngine.RenderEngine;
 import com.GameName.RenderEngine.Models.Model;
 import com.GameName.RenderEngine.Models.ModelLoader;
-import com.GameName.RenderEngine.Shaders.Shader;
 import com.GameName.RenderEngine.Util.Camera;
-import com.GameName.RenderEngine.Util.Color;
-import com.GameName.RenderEngine.Util.Color.ColorFormat;
 import com.GameName.RenderEngine.Util.RenderStructs.Transform;
 import com.GameName.RenderEngine.Window.Window;
 import com.GameName.Util.Vectors.Vector3f;
@@ -47,32 +44,28 @@ public class PhysicsTestRunner {
 	
 	private static MovingBody ellipseBody;
 	private static StaticBody staticBody;
+	private static StaticBody staticBody2;
 	
-	private static SphereRender sphere, sphereCenter, unitSphere;
-	private static Model cube, meshClone;
+	private static SphereRender sphere;
+	private static Model cube, cube2;
 	private static OctreeRender octreeRender;
 	
 	private static Transform sphereTransform;
 	private static Transform cubeTransform;
+	private static Transform cubeTransform2;
 	
 	private static float speed, sphereSpeed, rotationShereSpeed;
-	private static Vector3f target;
+	private static Vector3f target, targetRadius, radiusChangeRate;
 	
-	private static float[] meshData;
-	
-	private static ArrayList<Raycast> raycasts, raycastRenders;
-	private static float rayI, rayJ;
-	private static long startTime;
-	
-	private static ArrayList<PhysicsPlaneRender> collidedPlane;
-	private static ArrayList<PhysicsCubeRender> collidedAABB;
-	
-//	private static Raycast raycast;
-//	private static boolean rayRemoved;
+//	private static ArrayList<Raycast> raycasts, raycastRenders;
+//	private static ArrayList<PhysicsPlaneRender> collidedPlane;
+//	private static ArrayList<PhysicsCubeRender> collidedAABB;
+//	private static int rayI, rayJ;
+//	private static long startTime = -1;
 	
 	public static void main(String[] args) throws IOException, LWJGLException {
 		window = new Window();
-		window.setFPS(1200000);
+		window.setFPS(120);
 		window.initDisplay(600,600);
 		
 		init();
@@ -107,6 +100,7 @@ public class PhysicsTestRunner {
 		
 		sphere.cleanUp();
 		cube.cleanUp();
+		cube2.cleanUp();
 		
 		physicsShader.cleanUp();
 		
@@ -125,58 +119,59 @@ public class PhysicsTestRunner {
 		PhysicsRenderer physicsRenderer = (PhysicsRenderer) physicsShader.getRenderer();
 		renderEngine.addRenderer(physicsRenderer);
 		
-		// Create Collision Frames
-		CollisionEllipse collisionEllipse = new CollisionEllipse(new Vector3f(2, 4, .75)); //Vector3f.random(2).add(0.5f));//
+		// Create Collision Frames											2, 4, .75
+		CollisionEllipse collisionEllipse = new CollisionEllipse(Vector3f.random(10).add(0.1f)); //Vector3f.random(2).add(0.5f));//
 		CollisionMesh collisionMesh = CollisionMeshLoader.loadObj("res/models/cylinder.obj");//DefaultCube //cylinder 
+		CollisionMesh collisionMesh2 = CollisionMeshLoader.loadObj("res/models/invertedSphere.obj");//DefaultCube //cylinder 
 
 		// Create Object Transforms
 		sphereTransform = new Transform();
 		cubeTransform = new Transform();
+		cubeTransform2 = new Transform();
 		
 		// Transform transforms
 		cubeTransform.translate(new Vector3f(5, 0, 0));
 //		cubeTransform.rotate(new Vector3f(30834.768, 16627.076, 27693.992));
-
+		cubeTransform2.translate(new Vector3f(5, 0, -3));
+		
 		// Create Renders
-		sphere = new SphereRender(collisionEllipse, 30); // 		    collisionEllipse.getRadius().max()
-		unitSphere = new SphereRender(new CollisionEllipse(new Vector3f(1)), 30); // 0.99999f
-		sphereCenter = new SphereRender(new CollisionEllipse(new Vector3f(0.01f)), 3);
+		sphere = new SphereRender(new CollisionEllipse(new Vector3f(1)), 30); // 		    collisionEllipse.getRadius().max()
 
 		cube = new Model(ModelLoader.loadOBJ("res/models/cylinder.obj"));
-		meshClone = new Model(ModelLoader.loadOBJ("res/models/cylinder.obj"));
+		cube2 = new Model(ModelLoader.loadOBJ("res/models/invertedSphere.obj"));
 		octreeRender = new OctreeRender(collisionMesh.getOctree());
 		
-		meshData = ModelLoader.verti;
-
 		// Attach Shaders
 		sphere.setShader(physicsShader);
-		unitSphere.setShader(physicsShader);
-		sphereCenter.setShader(physicsShader);
 		
 		cube.setShader(physicsShader);
+		cube2.setShader(physicsShader);
 		octreeRender.setShader(physicsShader);
-		meshClone.setShader(physicsShader);
 
 		// Create Collision Bodies
 		ellipseBody = new MovingBody(collisionEllipse);
 		staticBody = new StaticBody(collisionMesh);
+		staticBody2 = new StaticBody(collisionMesh2);
 		
-		physicsEngine.add(staticBody);
-//		physicsEngine.add(ellipseBody);
+//		physicsEngine.add(staticBody);
+		physicsEngine.add(staticBody2);
+		physicsEngine.add(ellipseBody);
 		
 		staticBody.setPosition(cubeTransform.getTranslation());
 		staticBody.setRotation(cubeTransform.getRotation());
 		
-		raycasts = new ArrayList<>();
-		raycastRenders = new ArrayList<>();
+		staticBody2.setPosition(cubeTransform2.getTranslation());
+		staticBody2.setRotation(cubeTransform2.getRotation());
 		
-		raycasts.add(new Raycast(new Vector3f(8.537911, -2.570443, 2.424048), staticBody.getPosition()));
-		physicsEngine.add(raycasts.get(raycasts.size() - 1));
+		// ------------------------
 		
-		startTime = -1;
-		
-		collidedAABB = new ArrayList<>(); 
-		collidedPlane = new ArrayList<>();
+//		raycasts = new ArrayList<>();
+//		raycastRenders = new ArrayList<>();
+//		collidedAABB = new ArrayList<>(); 
+//		collidedPlane = new ArrayList<>();
+//		
+//		raycasts.add(new Raycast(new Vector3f(), staticBody.getPosition()));
+//		physicsEngine.add(raycasts.get(raycasts.size() - 1));
 	}
 	
 	private static boolean R_SHIFT = false, R_SHIFT_TOGGLE = false;
@@ -204,7 +199,9 @@ public class PhysicsTestRunner {
 			F_TOGGLE = false;
 		
 		// Sphere Movement
-		sphereSpeed = (float) ((Keyboard.isKeyDown(Keyboard.KEY_O) ? 2 : (Keyboard.isKeyDown(Keyboard.KEY_U) ? 0.25f : 1)) * window.getFrameTime());
+		sphereSpeed = 0.5f;
+		sphereSpeed = (float) ((Keyboard.isKeyDown(Keyboard.KEY_O) ? sphereSpeed * 2 : 
+			(Keyboard.isKeyDown(Keyboard.KEY_U) ? sphereSpeed / 2 : sphereSpeed)) * window.getFrameTime());
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_NUMPAD7)) ellipseBody.addVelocity(new Vector3f(0,  sphereSpeed, 0)); 
 		if(Keyboard.isKeyDown(Keyboard.KEY_NUMPAD1)) ellipseBody.addVelocity(new Vector3f(0, -sphereSpeed, 0));
@@ -256,117 +253,113 @@ public class PhysicsTestRunner {
 		if(Keyboard.isKeyDown(Keyboard.KEY_NUMPAD0))  {
 			ellipseBody.setPosition(new Vector3f());
 			ellipseBody.setRotation(new Vector3f());
+			
+			ellipseBody.setVelocity(new Vector3f());
+//			ellipseBody.setVelocity(new Vector3f(10 / 120.0, 0.01, -2 / 120.0)); 
 		}
 		
 		// Cube Rotation
 		if(cubeTransform.getRotation().x % 360 < target.x)
 			cubeTransform.setRotation(cubeTransform.getRotation().add(new Vector3f(90/2, 0, 0).multiply((float) window.getFrameTime())));
-		else target.x = 0;//(float) (Math.random() * 360);
+		else target.x = 3600;//(float) (Math.random() * 360);
 		
 		if(cubeTransform.getRotation().y % 360 < target.y)
-			cubeTransform.setRotation(cubeTransform.getRotation().add(new Vector3f(0,49/2, 0).multiply((float) window.getFrameTime())));
-		else target.y = 0;//(float) (Math.random() * 360);
+			cubeTransform.setRotation(cubeTransform.getRotation().add(new Vector3f(0, 49/2, 0).multiply((float) window.getFrameTime())));
+		else target.y = 36000;//(float) (Math.random() * 360);
 		
 		if(cubeTransform.getRotation().z % 360 < target.z)
 			cubeTransform.setRotation(cubeTransform.getRotation().add(new Vector3f(0, 0, 81/2).multiply((float) window.getFrameTime())));
-		else target.z = 0;//(float) (Math.random() * 360);
+		else target.z = 36000;//(float) (Math.random() * 360);
 			
 		if(Keyboard.isKeyDown(Keyboard.KEY_C)) cubeTransform.setRotation(cubeTransform.getRotation().multiply(0, 1, 1));
 		if(Keyboard.isKeyDown(Keyboard.KEY_V)) cubeTransform.setRotation(cubeTransform.getRotation().multiply(1, 0, 1));
 		if(Keyboard.isKeyDown(Keyboard.KEY_B)) cubeTransform.setRotation(cubeTransform.getRotation().multiply(1, 1, 0));
 		
-		staticBody.setRotation(cubeTransform.getRotation());
+//		staticBody.setRotation(cubeTransform.getRotation());
+//		ellipseBody.setRotation(cubeTransform.getRotation());
+//		cubeTransform2.setRotation(cubeTransform.getRotation());
 		
-//		if(Keyboard.isKeyDown(Keyboard.KEY_EQUALS)) {
-//			if(raycast != null) physicsEngine.remove(raycast);
+//		if(targetRadius == null || ellipseBody.getBody().getRadius().abs().subtract(targetRadius.abs()).lessThen(0.001f)) {
+//			targetRadius = Vector3f.random(10).add(0.1f);
+//			radiusChangeRate = targetRadius.subtract(ellipseBody.getBody().getRadius()).divide(120);
+//		} else {
+//			ellipseBody.getBody().setRadius(ellipseBody.getBody().getRadius().add(radiusChangeRate));
+//		}
+		
+//		ListIterator<Raycast> list = raycasts.listIterator();
+//		while(list.hasNext()) {
+//			if(startTime == -1)
+//				startTime = System.currentTimeMillis();
+//			Raycast ray = list.next();
 //			
-//			raycast = new Raycast(camera.getPosition(), camera.getPosition().add(
-//					new Vector3f(0, 0, -10).invertRotate(camera.getRotation().add(0, 0, 0))));
-//			physicsEngine.add(raycast);
-//			rayRemoved = false;
+//			if(ray.getIntersection() != null || ray.getStartPosition().distance(ray.getPosition()) > 10) {
+//				physicsEngine.remove(ray);
+////				if(ray.getIntersection() == null) {
+////					raycastRenders.clear();
+//					raycastRenders.add(ray);
+////				}
+//				
+//				list.remove();
+////				list.add(new Raycast(ray.getStartPosition(), ray.getEndPosition()));
+//				
+//				rayJ += 5;
+//				
+//				if(rayI > 180) {
+//					System.out.println("Done");
+//					long change = System.currentTimeMillis() - startTime;
+//					System.out.println(change / 1000.0);
+//					System.out.println(raycastRenders.size() > 0);
+//					
+//					break;
+//				}
+//				
+//				if(rayJ > 360) {
+//					rayI += 5;
+//					rayJ = 0;
+//				}
+//				
+//				float sin_s = (float) Math.sin(Math.toRadians(rayI));
+//				float sin_t = (float) Math.sin(Math.toRadians(rayJ));
+//				float cos_s = (float) Math.cos(Math.toRadians(rayI));
+//				float cos_t = (float) Math.cos(Math.toRadians(rayJ));
+//				
+//				list.add(new Raycast( new Vector3f(
+//							cos_s * sin_t * 5,
+//							sin_s * sin_t * 5,
+//							        cos_t * 5
+//						).add(staticBody.getPosition()),
+//						
+//						staticBody.getPosition())
+//					);
+//				
+//				physicsEngine.add(raycasts.get(raycasts.size() - 1));
+//			}
 //		}
 //		
-//		if(!rayRemoved && raycast != null && (raycast.getIntersection() != null || raycast.getStartPosition().distance(raycast.getPosition()) > 10)) {
-//			physicsEngine.remove(raycast);
-//			System.out.println("Removed: " + raycast.getIntersection());
-//			rayRemoved = true;
-//		}
-		
-		ListIterator<Raycast> list = raycasts.listIterator();
-		while(list.hasNext()) {
-			if(startTime == -1)
-				startTime = System.currentTimeMillis();
-			Raycast ray = list.next();
-			
-			if(ray.getIntersection() != null || ray.getStartPosition().distance(ray.getPosition()) > 10) {
-				physicsEngine.remove(ray);
-				if(ray.getIntersection() == null) {
-//					raycastRenders.clear();
-					raycastRenders.add(ray);
-				}
-				
-				list.remove();
-//				list.add(new Raycast(ray.getStartPosition(), ray.getEndPosition()));
-				
-				rayJ ++;
-//				System.out.println(rayJ);
-				
-				if(rayI > 180) {
-					System.out.println("Done");
-					long change = System.currentTimeMillis() - startTime;
-					System.out.println(change / 1000.0);
-					System.out.println(raycastRenders.size() > 0);
-					
-					break;
-				}
-				
-				if(rayJ > 360) {
-					rayI ++;
-					rayJ = 0;
-				}
-				
-				float sin_s = (float) Math.sin(Math.toRadians(rayI));
-				float sin_t = (float) Math.sin(Math.toRadians(rayJ));
-				float cos_s = (float) Math.cos(Math.toRadians(rayI));
-				float cos_t = (float) Math.cos(Math.toRadians(rayJ));
-				
-				list.add(new Raycast( new Vector3f(
-							cos_s * sin_t * 5,
-							sin_s * sin_t * 5,
-							        cos_t * 5
-						).add(staticBody.getPosition()),
-						
-						staticBody.getPosition())
-					);
-				
-				physicsEngine.add(raycasts.get(raycasts.size() - 1));
-			}
-		}
-		
-		if(raycasts.size() > 0) {
-			Raycast ray = raycasts.get(raycasts.size() - 1);
-			CollisionSphere cSphere = new CollisionSphere(0.01f, ray.getStartPosition());
-			
-			for(Model r : collidedAABB)
-				r.cleanUp();
-			collidedAABB.clear();
-			for(AABB aabb : staticBody.getMesh().getOctree().collect(cSphere, staticBody.getPosition(), 
-					ray.getEndPosition().subtract(ray.getStartPosition()), true)) {
-				
-				collidedAABB.add(new PhysicsCubeRender(aabb.getCenter(), aabb.getRadius()));
-				collidedAABB.get(collidedAABB.size() - 1).setShader(physicsShader);
-			}
-			
-			for(Model r : collidedPlane)
-				r.cleanUp();
-			collidedPlane.clear();
-			HashSet<Triangle> results = staticBody.getMesh().getOctree().collect(cSphere, staticBody.getPosition(), 
-					ray.getEndPosition().subtract(ray.getStartPosition()));
-			for(Triangle tri : results) {
-				collidedPlane.add(new PhysicsPlaneRender(tri.getA(), tri.getB(), tri.getC()));
-				collidedPlane.get(collidedPlane.size() - 1).setShader(physicsShader);
-			}
-		}
+////		if(raycastRenders.size() > 0) {
+////			Raycast ray = raycastRenders.get(raycastRenders.size() - 1);
+////			CollisionSphere cSphere = new CollisionSphere(0.01f, ray.getStartPosition());
+////			
+////			for(Model r : collidedAABB)
+////				r.cleanUp();
+////			collidedAABB.clear();
+////			for(AABB aabb : staticBody.getMesh().getOctree().collect(cSphere, staticBody.getPosition(), 
+////					ray.getEndPosition().subtract(ray.getStartPosition()), true)) {
+////				
+////				collidedAABB.add(new PhysicsCubeRender(aabb.getCenter(), aabb.getRadius()));
+////				collidedAABB.get(collidedAABB.size() - 1).setShader(physicsShader);
+////			}
+////			
+////			for(Model r : collidedPlane)
+////				r.cleanUp();
+////			collidedPlane.clear();
+////			HashSet<Triangle> results = staticBody.getMesh().getOctree().collect(cSphere, staticBody.getPosition(), 
+////					ray.getEndPosition().subtract(ray.getStartPosition()));
+////			for(Triangle tri : results) {
+////				collidedPlane.add(new PhysicsPlaneRender(tri.getA(), tri.getB(), tri.getC()));
+////				collidedPlane.get(collidedPlane.size() - 1).setShader(physicsShader);
+////			}
+////		}
 	}
 	
 	private static void render() {
@@ -380,105 +373,76 @@ public class PhysicsTestRunner {
 		if(F)
 			cpTransform.setScale(new Vector3f(1000, 1, 1));
 		
-		// Dynamic Rendering
-		
-//		Matrix4f transfrom = ellipseBody.getBody().getInverseTransform();
-//		Vector3f spherePosition = staticBody.getMesh().getPosition().subtract(ellipseBody.getPosition()).transform(transfrom).multiply(-1);
-//		
-//		float[] newData = new float[meshData.length];
-//		for(int i = 0; i < newData.length; i += 3) {
-//			Vector3f pos = new Vector3f(meshData[i], meshData[i+1], meshData[i+2]);
-//			
-//			pos = pos.rotate(staticBody.getRotation());
-//			pos = pos.transform(transfrom);
-//			
-//			newData[i + 0] = pos.x;
-//			newData[i + 1] = pos.y;
-//			newData[i + 2] = pos.z;
-//		}
-//		meshClone.getModelData().storeDataInAttributeList(Shader.ATTRIBUTE_LOC_POSITIONS, 3, newData, true);
-//		
-//		unitSphere.render(new PhysicsRenderProperties(new Transform(spherePosition, new Vector3f(), new Vector3f(1)), new Vector3f(1), false), camera);
-//		meshClone.render(new PhysicsRenderProperties(new Transform(), new Vector3f(1, 0, 1), true), camera);
-//		
 //		 Render Sphere
-//		sphereCenter.render(new PhysicsRenderProperties(cpTransform, new Vector3f(.75, 0, .75), false), camera);
-//		sphere.render(new PhysicsRenderProperties(sphereTransform, 
-//				ellipseBody.getIntersection() == null ? new Vector3f(0, 1, 0) : new Vector3f(1, 0, 0),
-//			false), camera);
-		
-//		Vector3f p0 = new Vector3f(-0.980785, 1.0, -0.195091).rotate(staticBody.getRotation()).add(staticBody.getPosition());
-//		Vector3f p1 = new Vector3f(0.19509, 1.0, -0.980785).rotate(staticBody.getRotation()).add(staticBody.getPosition());
-//		Vector3f p2 = new Vector3f(0.980785, 1.0, 0.19509).rotate(staticBody.getRotation()).add(staticBody.getPosition());
-		
-//		Transform p0Transform = new Transform(p0, new Vector3f(), new Vector3f(2));
-//		Transform p1Transform = new Transform(p1, new Vector3f(), new Vector3f(2));
-//		Transform p2Transform = new Transform(p2, new Vector3f(), new Vector3f(2));
-		
-//		sphereCenter.render(new PhysicsRenderProperties(p0Transform, new Vector3f(.5, 1, 1), false), camera);
-//		sphereCenter.render(new PhysicsRenderProperties(p1Transform, new Vector3f(.5, 1, 1), false), camera);
-//		sphereCenter.render(new PhysicsRenderProperties(p2Transform, new Vector3f( 0, 1, 0), false), camera);
+		sphereTransform.setScale(ellipseBody.getBody().getRadius());
+		sphere.render(new PhysicsRenderProperties(sphereTransform, 
+				ellipseBody.getIntersection() == null ? new Vector3f(0, 1, 0) : new Vector3f(1, 0, 0),
+			false), camera);
 			
-		if(rayI > 180) {
-			for(Raycast raycast : raycastRenders) {
-				if(raycast != null) {
-					Vector3f p0 = raycast.getStartPosition();
-					Vector3f p1 = raycast.getIntersection() == null ? raycast.getEndPosition() : raycast.getIntersection().getPoint();
-					
-					for(int i = 0; i < 1; i ++) {
-						Transform lineTransform = new Transform(p1.subtract(p0).divide(100).multiply(i).add(p0), new Vector3f(), new Vector3f(1));
-						sphereCenter.render(new PhysicsRenderProperties(lineTransform, 
-								raycast.getIntersection() == null ? new Vector3f(1, 0, 0) : new Vector3f(1, 1, 0), false), camera);
-					}
-				}
-			}
-		}
+//		if(rayI > 180) {
+//			for(Raycast raycast : raycastRenders) {
+//				if(raycast != null) {
+//					Vector3f p0 = raycast.getStartPosition();
+//					Vector3f p1 = raycast.getIntersection() == null ? raycast.getEndPosition() : raycast.getIntersection().getPoint();
+//					
+////					p0 = p0.subtract(staticBody.getPosition()).rotate(staticBody.getRotation()).add(staticBody.getPosition());
+////					p1 = p1.subtract(staticBody.getPosition()).rotate(staticBody.getRotation()).add(staticBody.getPosition());
+//					
+//					for(int i = 99; i < 100; i ++) {
+//						Transform lineTransform = new Transform(p1.subtract(p0).divide(100).multiply(i).add(p0), new Vector3f(), new Vector3f(1));
+////						sphere.render(new PhysicsRenderProperties(lineTransform, 
+////								raycast.getIntersection() == null ? new Vector3f(1, 0, 0) : new Vector3f(1, 1, 0), false), camera);
+//					}
+//				}
+//			}
+//		}
 		
-		if(raycasts.size() > 0) {
-			float i = 0;
-			for(Model r : collidedAABB) {
-				java.awt.Color color = java.awt.Color.getHSBColor((i ++ / collidedAABB.size()), .5f, 1);
-				r.render(new PhysicsRenderProperties(cubeTransform, new Vector3f(color.getRed(), color.getGreen(), color.getBlue()).divide(255), true), camera);
-			}
-			
-			Transform cubeTransformClone = cubeTransform.clone();
-			cubeTransformClone.setScale(cubeTransformClone.getScale().add(0.0001f));
-			
-			i = 0;
-			for(Model r : collidedPlane) {
-				java.awt.Color color = java.awt.Color.getHSBColor((i ++ / collidedPlane.size()), .5f, 1);
-				r.render(new PhysicsRenderProperties(cubeTransformClone, new Vector3f(color.getRed(), color.getGreen(), color.getBlue()).divide(255), true), camera);
-			}
-			
-			Raycast raycast = raycasts.get(raycasts.size() - 1);
-			if(raycast != null) {
-				Vector3f p0 = raycast.getStartPosition();
-				Vector3f p1 = raycast.getIntersection() == null ? raycast.getEndPosition() : raycast.getIntersection().getPoint();
-				
-				for(int j = 0; j < 100; j ++) {
-					Transform lineTransform = new Transform(p1.subtract(p0).divide(100).multiply(j).add(p0), new Vector3f(), new Vector3f(1));
-					sphereCenter.render(new PhysicsRenderProperties(lineTransform, 
-							raycast.getIntersection() == null ? new Vector3f(1, 0, 0) : new Vector3f(1, 1, 0), false), camera);
-				}
-			}
-		}
-		
-		sphereCenter.render(new PhysicsRenderProperties(new Transform(new Vector3f(8.537911, -2.570443, 2.424048), new Vector3f(0), new Vector3f(2)), new Vector3f(.25, .35, 1), false), camera);
-		
-//		unitSphere.render(new PhysicsRenderProperties(new Transform(ellipseBody.getPosition(), new Vector3f(), new Vector3f(ellipseBody.getBody().getRadius().max())), new Vector3f(.75f), false), camera);
+//		else if(raycastRenders.size() > 0) {
+////			float i = 0; for(Model r : collidedAABB) {
+////				java.awt.Color color = java.awt.Color.getHSBColor((i ++ / collidedAABB.size()), .5f, 1);
+////				r.render(new PhysicsRenderProperties(cubeTransform, new Vector3f(color.getRed(), color.getGreen(), color.getBlue()).divide(255), true), camera);
+////			}
+////			
+////			Transform cubeTransformClone = cubeTransform.clone();
+////			cubeTransformClone.setScale(cubeTransformClone.getScale().add(0.0001f));
+////			
+////			i = 0; for(Model r : collidedPlane) {
+////				java.awt.Color color = java.awt.Color.getHSBColor((i ++ / collidedPlane.size()), .5f, 1);
+////				r.render(new PhysicsRenderProperties(cubeTransformClone, new Vector3f(color.getRed(), color.getGreen(), color.getBlue()).divide(255), true), camera);
+////			}
+//			
+//			Raycast raycast = raycastRenders.get(raycastRenders.size() - 1);
+//			if(raycast != null) {
+//				Vector3f p0 = raycast.getStartPosition();
+//				Vector3f p1 = raycast.getIntersection() == null ? raycast.getEndPosition() : raycast.getIntersection().getPoint();
+//				
+//				p0 = p0.subtract(staticBody.getPosition()).rotate(staticBody.getRotation()).add(staticBody.getPosition());
+//				p1 = p1.subtract(staticBody.getPosition()).rotate(staticBody.getRotation()).add(staticBody.getPosition());
+//				
+//				for(int j = 0; j < 100; j ++) {
+//					Transform lineTransform = new Transform(p1.subtract(p0).divide(100).multiply(j).add(p0), new Vector3f(), new Vector3f(1));
+//					sphere.render(new PhysicsRenderProperties(lineTransform, 
+//							raycast.getIntersection() == null ? new Vector3f(1, 0, 0) : new Vector3f(1, 1, 0), false), camera);
+//				}
+//			}
+//		}
 		
 		// Render Main Cube
-		cube.render(new PhysicsRenderProperties(cubeTransform, new Vector3f(1, .5f, 0), !R_CTRL), camera);
+//		cube.render(new PhysicsRenderProperties(cubeTransform, new Vector3f(1, .5f, 0), !R_CTRL), camera);
+		cube2.render(new PhysicsRenderProperties(cubeTransform2, new Vector3f(0.1f), !R_CTRL), camera);
 		
 		if(!R_CTRL) {
-			Transform trans = cubeTransform.clone();
-			trans.setScale(new Vector3f(1.0001f));
+//			Transform trans = cubeTransform.clone();
+//			trans.setScale(new Vector3f(1.0001f));
+//			cube.render(new PhysicsRenderProperties(trans, new Vector3f(1, 1, 1), false), camera);
 			
-			cube.render(new PhysicsRenderProperties(trans, new Vector3f(1, 1, 1), false), camera);
+			Transform trans2 = cubeTransform2.clone();
+			trans2.setScale(new Vector3f(0.999f));
+			cube2.render(new PhysicsRenderProperties(trans2, new Vector3f(1, 1, 1), false), camera);
 		}
 		
-		if(!R_SHIFT)
-			octreeRender.render(new PhysicsRenderProperties(cubeTransform, new Vector3f(0, 0, .75f), false, true), camera);
+//		if(!R_SHIFT)
+//			octreeRender.render(new PhysicsRenderProperties(cubeTransform, new Vector3f(0, 0, .75f), false, true), camera);
 		
 		
 		

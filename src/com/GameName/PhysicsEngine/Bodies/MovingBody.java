@@ -62,11 +62,11 @@ public class MovingBody extends PhysicsBody {
 			body.intersect(tri, transVelocity, mesh.getRotation()); // ellipsoidSpace_meshOrigin
 			
 			if(result == null || intersection.getDistance() < result.getDistance()) {
-//				result = intersection;
+				result = intersection;
 				
-				Vector3f point = intersection.getPoint().transform(Matrix4f.invert(body.getInverseTransform(), null));
-				point = point.add(mesh.getPosition());
-				result = new IntersectionResult(point, intersection.getDistance());
+//				Vector3f point = intersection.getPoint().transform(Matrix4f.invert(body.getInverseTransform(), null));
+//				point = point.add(mesh.getPosition());
+//				result = new IntersectionResult(point, intersection.getDistance());
 			}
 		}
 		

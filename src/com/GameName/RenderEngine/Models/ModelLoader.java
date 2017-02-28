@@ -16,8 +16,6 @@ import com.GameName.Util.Vectors.Vector2f;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class ModelLoader {
-	public static float[] verti;
-	
 	public static ModelData loadOBJ(String filePath) {
 		if(!filePath.toLowerCase().endsWith(".obj")) 
 			throw new InvalidParameterException("loadOBJ can only load \"*.obj\" files!");
@@ -105,8 +103,6 @@ public class ModelLoader {
 			int[] indiciesArray = new int[indicies.size()];
 			for(int i = 0; i < indicies.size(); i ++)
 				indiciesArray[i] = indicies.get(i);	
-			
-			verti = vertecies;
 			
 			return loadModel(vertecies, texCoords, normals, indiciesArray, 
 					new boolean[]{false, false, false}, radius, 10000, center);
