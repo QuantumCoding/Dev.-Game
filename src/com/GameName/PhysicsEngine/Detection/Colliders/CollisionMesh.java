@@ -15,7 +15,7 @@ public class CollisionMesh extends CollisionBody {
 	}
 
 	public HashSet<Triangle> collect(CollisionSphere sphere, Vector3f velocity) { 
-		return octree.collect(sphere, super.position, velocity);
+		return octree.collect(sphere, velocity);
 	}
 
 	public Octree<Triangle> getOctree() { return octree; }

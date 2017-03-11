@@ -20,18 +20,18 @@ public class Triangle {
 		D = -normal.dot(A);
 	}	
 	
-	public Triangle changeSpace(Matrix4f transform, Vector3f preRotation) {
+	public Triangle changeSpace(Matrix4f inverseTransform, Matrix4f preTransfrom) {
 		Vector3f a = A.clone(), b = B.clone(), c = C.clone();
 		
-		if(preRotation != null) {
-			a = a.rotate(preRotation);
-			b = b.rotate(preRotation);
-			c = c.rotate(preRotation);
+		if(preTransfrom != null) {
+			a = a.transform(preTransfrom);
+			b = b.transform(preTransfrom);
+			c = c.transform(preTransfrom);
 		}
 		
-		a = a.transform(transform);
-		b = b.transform(transform);
-		c = c.transform(transform);
+		a = a.transform(inverseTransform);
+		b = b.transform(inverseTransform);
+		c = c.transform(inverseTransform);
 		
 		return new Triangle(a, b, c);
 	}

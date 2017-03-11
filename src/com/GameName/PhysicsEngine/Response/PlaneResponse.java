@@ -27,10 +27,12 @@ public class PlaneResponse {
 		Vector3f insterectPoint = intersection.getPoint();
 		
 		if(intersection.getDistance() > MIN_DISTANCE) {
-			Vector3f scaledVelocity = velocity.multiply(intersection.getDistance() - MIN_DISTANCE);
+			Vector3f normVelocity = velocity.normalize();
+			
+			Vector3f scaledVelocity = normVelocity.multiply(intersection.getDistance() - MIN_DISTANCE);
 			newPosition = position.add(scaledVelocity);
 			
-			insterectPoint = insterectPoint.subtract(velocity.multiply(MIN_DISTANCE));
+			insterectPoint = insterectPoint.subtract(normVelocity.multiply(MIN_DISTANCE));
 		}
 		
 		this.slidingPlane = new Plane(insterectPoint, newPosition.subtract(insterectPoint).normalize());
@@ -38,6 +40,7 @@ public class PlaneResponse {
 		Vector3f newDestinationPoint = destinationPoint.subtract(
 				slidingPlane.getNormal().multiply(slidingPlane.signedDistance(destinationPoint)));
 
+//		velocity.subtract(slidingPlane.getNormal().multiply(2 * slidingPlane.getNormal().dot(velocity)).normalize().multiply(2)); // 
 		newVelocity = newDestinationPoint.subtract(insterectPoint);
 	}
 	

@@ -149,6 +149,40 @@ public class MatrixUtil {
 		return dest;
 	}
 	
+	public static Vector3f rotateScale(Matrix4f left, Vector3f right) {
+		float x = left.m00 * right.x + left.m10 * right.y + left.m20 * right.z; 
+		float y = left.m01 * right.x + left.m11 * right.y + left.m21 * right.z; 
+		float z = left.m02 * right.x + left.m12 * right.y + left.m22 * right.z; 
+
+		return new Vector3f(x, y, z);
+	}
+	
+	public static Matrix4f copyScale(Vector3f vec, Matrix4f src, Matrix4f dest) {
+		if(dest == null) dest = new Matrix4f();
+		
+		dest.m00 = src.m00 * vec.x;
+		dest.m01 = src.m01 * vec.x;
+		dest.m02 = src.m02 * vec.x;
+		dest.m03 = src.m03 * vec.x;
+		
+		dest.m10 = src.m10 * vec.y;
+		dest.m11 = src.m11 * vec.y;
+		dest.m12 = src.m12 * vec.y;
+		dest.m13 = src.m13 * vec.y;
+		
+		dest.m20 = src.m20 * vec.z;
+		dest.m21 = src.m21 * vec.z;
+		dest.m22 = src.m22 * vec.z;
+		dest.m23 = src.m23 * vec.z;
+		
+		dest.m30 = src.m30;
+		dest.m31 = src.m31;
+		dest.m32 = src.m32;
+		dest.m33 = src.m33;
+		
+		return dest;
+	}
+	
 	public static Matrix subMatrix(Matrix subMatrix, int newLength, int xOff, int yOff) {
 		Matrix toRep = null;
 		if(newLength == 2) toRep = new Matrix2f();

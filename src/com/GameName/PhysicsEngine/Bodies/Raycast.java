@@ -1,8 +1,6 @@
 package com.GameName.PhysicsEngine.Bodies;
 
 import com.GameName.PhysicsEngine.Detection.Colliders.CollisionEllipse;
-import com.GameName.PhysicsEngine.Detection.Colliders.CollisionMesh;
-import com.GameName.PhysicsEngine.Detection.Intersection.IntersectionResult;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class Raycast extends MovingBody {
@@ -16,11 +14,8 @@ public class Raycast extends MovingBody {
 		super.setPosition(startPos);
 		this.startPos = startPos;
 		this.endPos = endPos;
-	}
-	
-	public IntersectionResult intersect(CollisionMesh mesh) {
+
 		setVelocity(endPos.subtract(startPos));
-		return super.intersect(mesh);
 	}
 	
 	public Vector3f getStartPosition() { return startPos; }

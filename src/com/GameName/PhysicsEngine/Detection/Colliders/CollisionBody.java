@@ -3,6 +3,11 @@ package com.GameName.PhysicsEngine.Detection.Colliders;
 import com.GameName.Util.Vectors.Vector3f;
 
 public abstract class CollisionBody {
+	/**
+	 *   Internal Variables used to pass addition information through the Physics Engine <BR>
+	 *   Do not assume that the value will reflect that of its accompanied 
+	 *   	{@link com.GameName.PhysicsEngine.Bodies.PhysicsBody PhysicsBody}
+	 */
 	protected Vector3f position;
 	protected Vector3f rotation;
 	
